@@ -11,10 +11,13 @@ namespace PspPos.Data
         }
 
         public DbSet<Sample> Samples => Set<Sample>();
+        public DbSet<Company> Companies => Set<Company>();
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Sample>().ToTable("Samples");
+            modelBuilder.Entity<Company>().ToTable("Companies");
         }
     }
 }

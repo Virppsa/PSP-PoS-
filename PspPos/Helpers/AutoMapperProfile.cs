@@ -8,6 +8,9 @@ public class AutoMapperProfiles : Profile
     {
         CreateMap<Sample, SampleViewModel>();
         CreateMap<SamplePostModel, Sample>();
+
+        CreateMap<Company, CompanyViewModel>();
+        CreateMap<CompanyPostModel, Company>();
     }
 }
 
