@@ -1,23 +1,47 @@
 ﻿using PspPos.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace PspPos.Data
+namespace PspPos.Data;
+
+public class SampleContext : DbContext
 {
-    public class SampleContext : DbContext
+    public SampleContext(DbContextOptions<SampleContext> options) : base(options)
+    { }
+
+    public DbSet<Sample> Samples => Set<Sample>();
+
+    public async Task<Sample[]> GetAllSamplesAsync()
     {
-        public SampleContext(DbContextOptions<SampleContext> options) : base(options)
-        {
+        return await Samples.ToArrayAsync();
+    }
 
-        }
+    public async Task<Sample> GetSampleAsync(int id)
+    {
+        var sample = await Samples.FindAsync(id);
+        if (sample is null)
+            throw new Exception($"Could not find sample with id {id}");
 
-        public DbSet<Sample> Samples => Set<Sample>();
-        public DbSet<Company> Companies => Set<Company>();
+        return sample;
+    }
 
+    public async Task AddSampleAsync(Sample sample)
+    {
+        await Samples.AddAsync(sample);
+        await this.SaveChangesAsync();
+    }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<Sample>().ToTable("Samples");
-            modelBuilder.Entity<Company>().ToTable("Companies");
-        }
+    public async Task<Sample> UpdateSampleAsync(Sample updatedSample)
+    {
+        var sample = await GetSampleAsync(updatedSample.Id);
+        sample.Location = updatedSample.Location;
+        await SaveChangesAsync();
+        return sample;
+    }
+
+    public async Task DeleteSampleAsync(int id)
+    {
+        var sample = await GetSampleAsync(id);
+        Samples.Remove(sample);
+        await SaveChangesAsync();
     }
 }

@@ -1,66 +1,54 @@
-using AutoMapper;
-using PspPos.Infrastructure;
 using PspPos.Models;
 using Microsoft.AspNetCore.Mvc;
+using PspPos.Data;
 
-namespace PspPos.Controllers
+namespace PspPos.Controllers;
+
+[ApiController]
+[Route("[controller]")]
+public class SampleController : ControllerBase
 {
-    [ApiController]
-    [Route("[controller]")]
-    public class SampleController : ControllerBase
+    private readonly SampleContext _sampleContext;
+    private int _debug_sample_count = 0;
+
+    public SampleController(SampleContext sampleContext)
     {
+        _sampleContext = sampleContext;
+    }
 
-        private readonly ISampleService _sampleService;
-        private readonly IMapper _mapper;
+    [HttpGet("{id}")]
+    public async Task<ActionResult<Sample>> GetSample(int id)
+    {
+        var sample = await _sampleContext.GetSampleAsync(id);
+        return Ok(sample);
+    }
 
-        public SampleController(ISampleService sampleService, IMapper mapper)
-        {
-            _sampleService = sampleService;
-            _mapper = mapper;
-        }
+    [HttpGet]
+    public async Task<ActionResult<List<Sample>>> GetAllSamples()
+    {
+        var samples = await _sampleContext.GetAllSamplesAsync();
+        return Ok(samples);
+    }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Sample>> GetSample(int id)
-        {
-            var sample = await _sampleService.Get(id);
-            return Ok(sample);
-        }
+    [HttpPost]
+    public async Task<ActionResult<Sample>> CreateSample(SamplePostModel sample)
+    {
+        var createdSample = new Sample(_debug_sample_count, sample);
+        await _sampleContext.AddSampleAsync(createdSample);
 
-        [HttpGet]
-        public async Task<ActionResult<List<Sample>>> GetAllSamples()
-        {
-            return Ok(await _sampleService.GetAll());
-        }
+        return Ok(createdSample);
+    }
 
-        [HttpPost]
-        public async Task<ActionResult<Sample>> CreateSample(SamplePostModel sample)
-        {
-            var createdSample = _mapper.Map<Sample>(sample);
-            await _sampleService.Add(createdSample);
-            await _sampleService.SaveAll();
+    [HttpPut]
+    public async Task<ActionResult<Sample>> UpdateSample(Sample sample)
+    {
+        return Ok(await _sampleContext.UpdateSampleAsync(sample));
+    }
 
-            return Ok(_mapper.Map<SampleViewModel>(createdSample));
-        }
-
-        [HttpPut]
-        public async Task<ActionResult<Sample>> UpdateSample(Sample sample)
-        {
-            var sampleToUpdate = await _sampleService.Get(sample.Id);
-            if (sampleToUpdate == null)
-            {
-                return NotFound();
-            }
-            //_mapper.Map(sample, sampleToUpdate);
-            sampleToUpdate.Location = sample.Location;
-            sampleToUpdate.Date = sample.Date;
-            await _sampleService.SaveAll();
-            return Ok(sampleToUpdate);
-        }
-
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<Sample>> DeleteSample(int id)
-        {
-            return Ok(await _sampleService.Delete(id));
-        }
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> DeleteSample(int id)
+    {
+        await _sampleContext.DeleteSampleAsync(id);
+        return Ok();
     }
 }

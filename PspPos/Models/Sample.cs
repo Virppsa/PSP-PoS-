@@ -1,12 +1,17 @@
-using Microsoft.AspNetCore.Mvc;
+namespace PspPos.Models;
 
-namespace PspPos.Models
+public class Sample
 {
-    public class Sample
-    {
-        public int Id { set; get; }
-        public string? Location { set; get; }
-        public DateTime? Date { set; get; } = DateTime.Now;
+    public int Id { init; get; }
+    public string? Location { set; get; }
+    public DateTime Date { set; get; } = DateTime.Now;
 
+    public Sample() { }
+
+    public Sample(int id, SamplePostModel postSample)
+    {
+        Id = id;
+        Location = postSample.Location;
+        Date = postSample.Date;
     }
 }

@@ -10,7 +10,7 @@ using PspPos.Data;
 
 namespace PspPos.Migrations
 {
-    [DbContext(typeof(SampleContext))]
+    [DbContext(typeof(ApplicationContext))]
     partial class SampleContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
