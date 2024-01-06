@@ -98,7 +98,7 @@ public class OrderController : ControllerBase
         {
             return Ok(await _orderService.Update(companyId, orderId, order));
         }
-        catch (NotFoundException ex)
+        catch (NotFoundException ex) 
         {
             return NotFound(ex.Message);
         }
