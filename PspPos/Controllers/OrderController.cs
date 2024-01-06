@@ -92,7 +92,7 @@ public class OrderController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<Order>> UpdateOrder([Required] int companyId, [Required] int orderId, [Required] OrderPostModel order)
+    public async Task<ActionResult<Order>> UpdateOrder([Required] Guid companyId, [Required] Guid orderId, [Required] OrderPostModel order)
     {
         try
         {
