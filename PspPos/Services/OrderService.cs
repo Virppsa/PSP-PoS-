@@ -3,23 +3,33 @@ using PspPos.Infrastructure;
 using PspPos.Models;
 using Microsoft.EntityFrameworkCore;
 using PspPos.Commons;
+using AutoMapper;
 
 namespace PspPos.Services;
 
 public class OrderService : IOrderService
 {
     private readonly ApplicationContext _context;
-    //private readonly IMapper _mapper;
+    private readonly IMapper _mapper;
 
-    public OrderService(ApplicationContext context)
+    public OrderService(ApplicationContext context, IMapper mapper)
     {
         _context = context;
+        _mapper = mapper;
     }
 
-    public async Task Add(int companyId, Order order)
+    public async Task<Order> Add(int companyId, OrderPostModel order)
     {
-        await _context.Orders.AddAsync(order);
+        if(!await _context.CheckIfCompanyExists(companyId))
+            throw new NotFoundException($"Company with id={companyId} not found");
+
+        var createdOrder = _mapper.Map<Order>(order);
+        createdOrder.CompanyId = companyId;
+
+        await _context.Orders.AddAsync(createdOrder);
         await _context.SaveChangesAsync();
+
+        return createdOrder;
     }
 
     public async Task<bool> Delete(int companyId, int id)
@@ -51,8 +61,23 @@ public class OrderService : IOrderService
         return orders.Where(o => o.CompanyId == companyId).ToList();
     }
 
-    public Task<Order> Update(int companyId, Order order)
+    public async Task<Order> Update(int companyId, int orderId, OrderPostModel order)
     {
-        throw new NotImplementedException();
+        if (!await _context.CheckIfCompanyExists(companyId))
+            throw new NotFoundException($"Company with id={companyId} not found");
+
+        var orderToUpdate = await Get(companyId, orderId);
+
+        orderToUpdate.WorkerId = order.WorkerId;
+        orderToUpdate.CustomerId = order.CustomerId;
+        orderToUpdate.PaymentMethodId = order.PaymentMethodId;
+        orderToUpdate.Gratuity = order.Gratuity;
+        orderToUpdate.Appointments = order.Appointments;
+        orderToUpdate.ItemOrders = order.ItemOrders;
+        orderToUpdate.Status = order.Status;
+
+        await _context.SaveChangesAsync();
+
+        return orderToUpdate;
     }
 }
