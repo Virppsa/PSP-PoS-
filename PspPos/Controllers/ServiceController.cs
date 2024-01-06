@@ -106,7 +106,7 @@ namespace PspPos.Controllers
                 return StatusCode(StatusCodes.Status404NotFound, "Provided Company does not exist");
             }
 
-            var service = new Service { Id = serviceId, companyId = companyId, Description = body.Description, Price = body.Price, Name = body.Name, Tax = body.Price * TaxSystem.Tax };
+            var service = new Service { Id = serviceId, companyId = companyId, Description = body.Description, Price = body.Price, Name = body.Name, Tax = body.Price * TaxSystem.TaxMultiplier };
             // calculate tax and add also
 
             try 
