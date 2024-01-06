@@ -8,7 +8,7 @@ namespace PspPos.Models
         // add nulable with ?
 
         [Key]
-        public int Id { get; set; }
+        public Guid GUID { get; set; }
         [ForeignKey("Company")]
         public int CompanyId { get; set; }
         public int StoreId { get; set; }
