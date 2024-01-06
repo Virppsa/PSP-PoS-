@@ -2,9 +2,6 @@
 using PspPos.Infrastructure;
 using PspPos.Services;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using System;
 
 namespace PspPos.Commons;
 public static class DependencyInjection
