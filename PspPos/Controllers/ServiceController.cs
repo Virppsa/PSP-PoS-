@@ -17,13 +17,13 @@ namespace PspPos.Controllers
     public class ServiceController : ControllerBase
     {
         private readonly IServiceRepository _serviceRepository;
-        private readonly IAppointmentRepository _appointmentRepository;
+        // private readonly IAppointmentRepository _appointmentRepository;
         private readonly ApplicationContext _context;
 
-        public ServiceController(IServiceRepository serviceRepository, IAppointmentRepository appointmentRepository, ApplicationContext context)
+        public ServiceController(IServiceRepository serviceRepository/*, IAppointmentRepository appointmentRepository*/, ApplicationContext context)
         {
             _serviceRepository = serviceRepository;
-            _appointmentRepository = appointmentRepository;
+            // _appointmentRepository = appointmentRepository;
             _context = context;
         }
 
