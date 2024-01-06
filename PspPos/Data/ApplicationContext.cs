@@ -13,6 +13,7 @@ public class ApplicationContext : DbContext
     public DbSet<Sample> Samples => Set<Sample>();
     public DbSet<Company> Companies => Set<Company>();
     public DbSet<Order> Orders => Set<Order>();
+    public DbSet<User> Users => Set<User>();
 
     private HashSet<int>? _availableCompanies = null; 
 
@@ -34,5 +35,14 @@ public class ApplicationContext : DbContext
             return true;
 
         return false;
+    }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<User>().ToTable("Users");
+        modelBuilder.Entity<User>()
+            .HasOne(u => u.Company)
+            .WithMany()
+            .HasForeignKey(u => u.CompanyId);
     }
 }
