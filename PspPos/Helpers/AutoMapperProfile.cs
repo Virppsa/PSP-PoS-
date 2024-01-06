@@ -11,6 +11,10 @@ public class AutoMapperProfiles : Profile
 
         CreateMap<Company, CompanyViewModel>();
         CreateMap<CompanyPostModel, Company>();
+
+        CreateMap<OrderPostModel, Order>();
+
+        CreateMap<UserPostModel, User>();
     }
 }
 
