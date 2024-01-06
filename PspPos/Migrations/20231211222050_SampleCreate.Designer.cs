@@ -11,7 +11,7 @@ using PspPos.Data;
 
 namespace PspPos.Migrations
 {
-    [DbContext(typeof(SampleContext))]
+    [DbContext(typeof(ApplicationContext))]
     [Migration("20231211222050_SampleCreate")]
     partial class SampleCreate
     {
