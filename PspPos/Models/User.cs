@@ -5,8 +5,6 @@ namespace PspPos.Models
 {
     public class User
     {
-        // add nulable with ?
-
         [Key]
         public Guid GUID { get; set; }
         [ForeignKey("Company")]
