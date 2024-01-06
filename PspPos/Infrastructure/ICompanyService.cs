@@ -8,7 +8,7 @@ namespace PspPos.Infrastructure
         public Task<Company> Get(int id);
         public Task<List<Company>> GetAll();
         public Task<Company> Delete(int id);
-        public Task SaveAll();
+        public Task<Company> Update(Company company);
 
     }
 }

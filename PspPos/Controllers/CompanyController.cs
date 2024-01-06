@@ -30,7 +30,6 @@ namespace PspPos.Controllers
         {
             var createdCompany = _mapper.Map<Company>(company);
             await _companyService.Add(createdCompany);
-            await _companyService.SaveAll();
 
             return Ok(_mapper.Map<CompanyViewModel>(createdCompany));
         }
@@ -44,16 +43,13 @@ namespace PspPos.Controllers
         [HttpPut("{companyId}")]
         public async Task<ActionResult<Company>> UpdateCompany(int companyId, CompanyPostModel company)
         {
-            var companyToUpdate = await _companyService.Get(companyId);
-            if (companyToUpdate == null)
-            {
-                return NotFound();
-            }
-            //_mapper.Map(sample, sampleToUpdate);
-            companyToUpdate.Name = company.Name;
-            companyToUpdate.Email = company.Email;
-            await _companyService.SaveAll();
-            return Ok(companyToUpdate);
+            var companyUpdateWith = _mapper.Map<Company>(company);
+            companyUpdateWith.Id = companyId;
+
+            var updatedCompany = await _companyService.Update(companyUpdateWith);
+
+            // Oops... 404 not implemented
+            return Ok(updatedCompany);
         }
 
         [HttpDelete("{companyId}")]

@@ -4,6 +4,7 @@ using PspPos.Infrastructure;
 using PspPos.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.ComponentModel.Design;
 
 namespace PspPos.Services
 {
@@ -21,6 +22,7 @@ namespace PspPos.Services
         public async Task Add(Company company)
         {
             await _context.Companies.AddAsync(company);
+            await _context.SaveChangesAsync();
         }
 
         public async Task<Company> Get(int id)
@@ -51,10 +53,18 @@ namespace PspPos.Services
             return company;
         }
 
-        public async Task SaveAll()
+        public async Task<Company> Update(Company company)
         {
-            await _context.SaveChangesAsync();
-        }
+            var companyToUpdate = await Get(company.Id);
+            if (companyToUpdate == null)
+            {
+                throw new Exception("Company not found");
+            }
 
+            companyToUpdate.Name = company.Name;
+            companyToUpdate.Email = company.Email;
+            await _context.SaveChangesAsync();
+            return companyToUpdate;
+        }
     }
 }
