@@ -25,14 +25,11 @@ namespace PspPos.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task<Company> Get(int id)
+        public async Task<Company?> Get(int id)
         {
-            var company = await _context.Companies.FindAsync(id);
-            if (company == null)
-            {
-                throw new Exception("Company not found");
-            }
-            return company;
+
+            return await _context.Companies.FindAsync(id);
+
         }
 
         public async Task<List<Company>> GetAll()
@@ -40,25 +37,25 @@ namespace PspPos.Services
             return await _context.Companies.ToListAsync();
         }
 
-        public async Task<Company> Delete(int id)
+        public async Task<bool> Delete(int id)
         {
             var company = await _context.Companies.FindAsync(id);
             if (company == null)
             {
-                throw new Exception("Company not found");
+                return false; // Not found
             }
             _context.Companies.Remove(company);
 
             await _context.SaveChangesAsync();
-            return company;
+            return true; // Successful
         }
 
-        public async Task<Company> Update(Company company)
+        public async Task<Company?> Update(Company company)
         {
             var companyToUpdate = await Get(company.Id);
             if (companyToUpdate == null)
             {
-                throw new Exception("Company not found");
+                return null;
             }
 
             companyToUpdate.Name = company.Name;

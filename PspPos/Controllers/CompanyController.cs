@@ -37,6 +37,10 @@ namespace PspPos.Controllers
         public async Task<ActionResult<Company>> GetCompany(int companyId)
         {
             var company = await _companyService.Get(companyId);
+            if (company == null)
+            {
+                return NotFound();
+            }
             return Ok(company);
         }
 
@@ -48,20 +52,24 @@ namespace PspPos.Controllers
 
             var updatedCompany = await _companyService.Update(companyUpdateWith);
 
-            // Oops... 404 not implemented
+            if (updatedCompany == null)
+            {
+                return NotFound();
+            }
+
             return Ok(updatedCompany);
         }
 
         [HttpDelete("{companyId}")]
         public async Task<ActionResult> DeleteCompany(int companyId)
         {
-            var deleted = await _companyService.Delete(companyId);
-            if (deleted != null)
+            bool deleted = await _companyService.Delete(companyId);
+            if (deleted == false)
             {
-                return NoContent();
+                return NotFound();
             }
             else { 
-                return NotFound();
+                return NoContent();
             }
         }
     }
