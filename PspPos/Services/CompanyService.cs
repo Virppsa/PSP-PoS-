@@ -9,10 +9,10 @@ namespace PspPos.Services
 {
     public class CompanyService : ICompanyService
     {
-        private readonly SampleContext _context;
+        private readonly ApplicationContext _context;
         private readonly IMapper _mapper;
 
-        public CompanyService(SampleContext context, IMapper mapper)
+        public CompanyService(ApplicationContext context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;

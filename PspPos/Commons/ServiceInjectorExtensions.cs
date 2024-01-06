@@ -12,7 +12,7 @@ public static class DependencyInjection
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         var defaultConnectionString = configuration.GetConnectionString("DefaultConnection");
-        services.AddDbContext<SampleContext>(options =>
+        services.AddDbContext<ApplicationContext>(options =>
            options.UseSqlServer(defaultConnectionString));
 
 
