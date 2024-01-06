@@ -4,15 +4,16 @@ using PspPos.Infrastructure;
 using PspPos.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.ComponentModel.Design;
 
 namespace PspPos.Services
 {
     public class CompanyService : ICompanyService
     {
-        private readonly SampleContext _context;
+        private readonly ApplicationContext _context;
         private readonly IMapper _mapper;
 
-        public CompanyService(SampleContext context, IMapper mapper)
+        public CompanyService(ApplicationContext context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;
@@ -21,16 +22,14 @@ namespace PspPos.Services
         public async Task Add(Company company)
         {
             await _context.Companies.AddAsync(company);
+            await _context.SaveChangesAsync();
         }
 
-        public async Task<Company> Get(int id)
+        public async Task<Company?> Get(int id)
         {
-            var company = await _context.Companies.FindAsync(id);
-            if (company == null)
-            {
-                throw new Exception("Company not found");
-            }
-            return company;
+
+            return await _context.Companies.FindAsync(id);
+
         }
 
         public async Task<List<Company>> GetAll()
@@ -38,23 +37,31 @@ namespace PspPos.Services
             return await _context.Companies.ToListAsync();
         }
 
-        public async Task<Company> Delete(int id)
+        public async Task<bool> Delete(int id)
         {
             var company = await _context.Companies.FindAsync(id);
             if (company == null)
             {
-                throw new Exception("Company not found");
+                return false; // Not found
             }
             _context.Companies.Remove(company);
 
             await _context.SaveChangesAsync();
-            return company;
+            return true; // Successful
         }
 
-        public async Task SaveAll()
+        public async Task<Company?> Update(Company company)
         {
-            await _context.SaveChangesAsync();
-        }
+            var companyToUpdate = await Get(company.Id);
+            if (companyToUpdate == null)
+            {
+                return null;
+            }
 
+            companyToUpdate.Name = company.Name;
+            companyToUpdate.Email = company.Email;
+            await _context.SaveChangesAsync();
+            return companyToUpdate;
+        }
     }
 }

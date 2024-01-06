@@ -11,7 +11,7 @@ using PspPos.Data;
 
 namespace PspPos.Migrations
 {
-    [DbContext(typeof(SampleContext))]
+    [DbContext(typeof(ApplicationContext))]
     [Migration("20240102163729_CompanyCreate")]
     partial class CompanyCreate
     {

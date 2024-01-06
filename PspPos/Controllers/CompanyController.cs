@@ -30,7 +30,6 @@ namespace PspPos.Controllers
         {
             var createdCompany = _mapper.Map<Company>(company);
             await _companyService.Add(createdCompany);
-            await _companyService.SaveAll();
 
             return Ok(_mapper.Map<CompanyViewModel>(createdCompany));
         }
@@ -38,34 +37,39 @@ namespace PspPos.Controllers
         public async Task<ActionResult<Company>> GetCompany(int companyId)
         {
             var company = await _companyService.Get(companyId);
+            if (company == null)
+            {
+                return NotFound();
+            }
             return Ok(company);
         }
 
         [HttpPut("{companyId}")]
         public async Task<ActionResult<Company>> UpdateCompany(int companyId, CompanyPostModel company)
         {
-            var companyToUpdate = await _companyService.Get(companyId);
-            if (companyToUpdate == null)
+            var companyUpdateWith = _mapper.Map<Company>(company);
+            companyUpdateWith.Id = companyId;
+
+            var updatedCompany = await _companyService.Update(companyUpdateWith);
+
+            if (updatedCompany == null)
             {
                 return NotFound();
             }
-            //_mapper.Map(sample, sampleToUpdate);
-            companyToUpdate.Name = company.Name;
-            companyToUpdate.Email = company.Email;
-            await _companyService.SaveAll();
-            return Ok(companyToUpdate);
+
+            return Ok(updatedCompany);
         }
 
         [HttpDelete("{companyId}")]
         public async Task<ActionResult> DeleteCompany(int companyId)
         {
-            var deleted = await _companyService.Delete(companyId);
-            if (deleted != null)
+            bool deleted = await _companyService.Delete(companyId);
+            if (deleted == false)
             {
-                return NoContent();
+                return NotFound();
             }
             else { 
-                return NotFound();
+                return NoContent();
             }
         }
     }

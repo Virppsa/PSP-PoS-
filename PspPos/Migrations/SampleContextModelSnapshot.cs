@@ -10,7 +10,7 @@ using PspPos.Data;
 
 namespace PspPos.Migrations
 {
-    [DbContext(typeof(SampleContext))]
+    [DbContext(typeof(ApplicationContext))]
     partial class SampleContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
@@ -21,25 +21,6 @@ namespace PspPos.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("PspPos.Models.Company", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Email")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Companies", (string)null);
-                });
 
             modelBuilder.Entity("PspPos.Models.Sample", b =>
                 {

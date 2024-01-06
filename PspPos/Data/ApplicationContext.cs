@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace PspPos.Data
 {
-    public class SampleContext : DbContext
+    public class ApplicationContext : DbContext
     {
-        public SampleContext(DbContextOptions<SampleContext> options) : base(options)
+        public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options)
         {
 
         }
