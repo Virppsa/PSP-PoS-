@@ -40,11 +40,6 @@ public class ApplicationContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // Why were these gone??
-        modelBuilder.Entity<Sample>().ToTable("Samples");
-        modelBuilder.Entity<Company>().ToTable("Companies");
-        modelBuilder.Entity<Item>().ToTable("Items");
-        modelBuilder.Entity<Item>().ToTable("Orders");
         modelBuilder.Entity<User>().ToTable("Users");
         modelBuilder.Entity<User>()
             .HasOne(u => u.Company)

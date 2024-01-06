@@ -27,9 +27,10 @@ namespace PspPos.Controllers
         }
 
         [HttpPost("{companyId}")]
-        public async Task<ActionResult<ItemViewModel>> CreateItem(ItemPostModel item)
+        public async Task<ActionResult<ItemViewModel>> CreateItem(Guid companyId, ItemPostModel item)
         {
             var createdItem = _mapper.Map<Item>(item);
+            createdItem.CompanyId = companyId;
             await _itemsService.Add(createdItem);
 
             return Ok(_mapper.Map<ItemViewModel>(createdItem));
@@ -47,7 +48,7 @@ namespace PspPos.Controllers
         }
 
         [HttpPut("{companyId}/items/{itemId}")]
-        public async Task<ActionResult<Item>> UpdateCompany(Guid companyId, Guid itemId, ItemPostModel item)
+        public async Task<ActionResult<ItemViewModel>> UpdateItem(Guid companyId, Guid itemId, ItemPostModel item)
         {
             var itemUpdateWith = _mapper.Map<Item>(item);
             itemUpdateWith.Id = itemId;
@@ -60,7 +61,7 @@ namespace PspPos.Controllers
                 return NotFound();
             }
 
-            return Ok(updatedItem);
+            return Ok(_mapper.Map<ItemViewModel>(updatedItem));
         }
 
         [HttpDelete("{companyId}/items/{itemId}")]

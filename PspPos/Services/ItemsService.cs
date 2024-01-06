@@ -21,55 +21,91 @@ namespace PspPos.Services
 
         public async Task Add(Item item)
         {
-            // TODO: check whether company exists (use cache)
-            await _context.Items.AddAsync(item);
-            await _context.SaveChangesAsync();
+            if (await _context.CheckIfCompanyExists(item.CompanyId) == false)
+            {
+                throw new Exception($"Company with id={item.CompanyId} doesn't exist");
+            } 
+            else
+            {
+                //This will calculate tax
+                //item.Tax = item.Price * 0.1;
+                await _context.Items.AddAsync(item);
+                await _context.SaveChangesAsync();
+            }
         }
 
         public async Task<Item?> Get(Guid companyId, Guid itemId)
         {
-            // TODO: check whether company exists (use cache)
-            return await _context.Items.FindAsync(itemId);
-
+            if (await _context.CheckIfCompanyExists(companyId) == false)
+            {
+                throw new Exception($"Company with id={companyId} doesn't exist");
+            }
+            else
+            {
+                return await _context.Items.FindAsync(itemId);
+            }
         }
 
         public async Task<List<Item>> GetAll(Guid companyId)
         {
-            // TODO: check whether company exists (use cache)
-
-            //Also idk why I'm doing this filtering...
-            var companyItems = from item in await _context.Items.ToListAsync()
-                               where item.CompanyId == companyId
-                               select item;
-            return companyItems.ToList();
+            if (await _context.CheckIfCompanyExists(companyId) == false)
+            {
+                throw new Exception($"Company with id={companyId} doesn't exist");
+            }
+            else
+            {
+                var companyItems = from item in await _context.Items.ToListAsync()
+                                   where item.CompanyId == companyId
+                                   select item;
+                return companyItems.ToList();
+            }
         }
 
         public async Task<bool> Delete(Guid companyId, Guid id)
         {
-            //CompanyId left unused...
-            
-            var item = await _context.Items.FindAsync(id);
-            if (item == null)
+            if (await _context.CheckIfCompanyExists(companyId) == false)
             {
-                return false; // Not found
+                throw new Exception($"Company with id={companyId} doesn't exist");
             }
+            else
+            {
+                var item = await _context.Items.FindAsync(id);
+                if (item == null)
+                {
+                    return false; // Not found
+                }
 
-            _context.Items.Remove(item);
+                _context.Items.Remove(item);
 
-            await _context.SaveChangesAsync();
-            return true; // Successful
+                await _context.SaveChangesAsync();
+                return true; // Successful
+            }
         }
 
         public async Task<Item?> Update(Item item)
         {
-            var itemToUpdate = await Get(item.CompanyId, item.Id);
-            if (itemToUpdate == null)
+            if (await _context.CheckIfCompanyExists(item.CompanyId) == false)
             {
-                return null;
+                throw new Exception($"Company with id={item.CompanyId} doesn't exist");
             }
-            itemToUpdate = _mapper.Map<Item>(item);
-            await _context.SaveChangesAsync();
-            return itemToUpdate;
+            else
+            {
+                var itemToUpdate = await Get(item.CompanyId, item.Id);
+                if (itemToUpdate == null)
+                {
+                    return null;
+                }
+
+                itemToUpdate.Name = item.Name;
+                itemToUpdate.Description = item.Description;
+                itemToUpdate.Price = item.Price;
+
+                //This will calculate tax
+                //itemToUpdate.Tax = item.Price * 0.1;
+
+                await _context.SaveChangesAsync();
+                return itemToUpdate;
+            }
         }
     }
 }
