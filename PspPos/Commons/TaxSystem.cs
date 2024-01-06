@@ -6,7 +6,7 @@ namespace PspPos.Commons
     public class TaxSystem
     {
         // this should be used as a multiplier for calculating tax.
-        public readonly static decimal TaxMultiplier = 0.1M;
+        public readonly static float TaxMultiplier = 0.1f;
 
         public static ServiceDiscount CreateDefaultServiceDiscount (Guid serviceId)
         {

@@ -11,7 +11,7 @@ namespace PspPos.Models
         public string? Name { set; get; }
         public string? Description { set; get; }
         public double? Price { set; get; }
-        public decimal? Tax { set; get; }
+        public double? Tax { set; get; }
         public string? SerializedDiscount { get; set; }
     }
 }
