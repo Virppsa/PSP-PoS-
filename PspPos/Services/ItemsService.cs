@@ -5,6 +5,7 @@ using PspPos.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.ComponentModel.Design;
+using PspPos.Commons;
 
 namespace PspPos.Services
 {
@@ -27,8 +28,7 @@ namespace PspPos.Services
             } 
             else
             {
-                //This will calculate tax
-                //item.Tax = item.Price * 0.1;
+                item.Tax = item.Price * TaxSystem.TaxMultiplier;
                 await _context.Items.AddAsync(item);
                 await _context.SaveChangesAsync();
             }
@@ -99,9 +99,7 @@ namespace PspPos.Services
                 itemToUpdate.Name = item.Name;
                 itemToUpdate.Description = item.Description;
                 itemToUpdate.Price = item.Price;
-
-                //This will calculate tax
-                //itemToUpdate.Tax = item.Price * 0.1;
+                itemToUpdate.Tax = item.Price * TaxSystem.TaxMultiplier;
 
                 await _context.SaveChangesAsync();
                 return itemToUpdate;
