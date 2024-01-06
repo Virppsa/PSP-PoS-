@@ -23,10 +23,10 @@ public class OrderController : ControllerBase
 
     // ORDERS:
     // Get all orders +
-    // Create an order ~
+    // Create an order +
     // Get an order +
-    // Update an order (merge with update status and assign employee)
-    // Delete an order 
+    // Update an order (merge with update status and assign employee) ~
+    // Delete an order +
 
     // DISCOUNTS:
     // Create order discount?
@@ -36,6 +36,9 @@ public class OrderController : ControllerBase
     // Get specific ItemOrder
     // Delete ItemOrder
     // Update ItemOrder (merge status and assign)
+
+    // TODO:
+    // get total price and tax and discount
 
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -59,18 +62,21 @@ public class OrderController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<Order>> CreateOrder([Required]int companyId, [Required] OrderPostModel order)
     {
-        //var createdCompany = _mapper.Map<Or>(company);
-        var createdOrder = new Order() { CompanyId = companyId };
-        await _orderService.Add(companyId, createdOrder);
-
-        return Ok(createdOrder);
+        try
+        {
+            return Ok(await _orderService.Add(companyId, order));
+        }
+        catch(NotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
     }
 
     [HttpGet("{orderId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<Company>> GetOrder(int companyId, int orderId)
+    public async Task<ActionResult<Company>> GetOrder([Required]int companyId, [Required] int orderId)
     {
         try
         {
@@ -82,27 +88,27 @@ public class OrderController : ControllerBase
         }
     }
 
-    //[HttpPut("{companyId}")]
-    //public async Task<ActionResult<Company>> UpdateCompany(int companyId, CompanyPostModel company)
-    //{
-    //    var companyUpdateWith = _mapper.Map<Company>(company);
-    //    companyUpdateWith.Id = companyId;
-
-    //    var updatedCompany = await _companyService.Update(companyUpdateWith);
-
-    //    if (updatedCompany == null)
-    //    {
-    //        return NotFound();
-    //    }
-
-    //    return Ok(updatedCompany);
-    //}
+    [HttpPut("{companyId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<Order>> UpdateOrder([Required] int companyId, [Required] int orderId, [Required] OrderPostModel order)
+    {
+        try
+        {
+            return Ok(await _orderService.Update(companyId, orderId, order));
+        }
+        catch (NotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+    }
 
     [HttpDelete("{orderId}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult> DeleteCompany(int companyId, int orderId)
+    public async Task<ActionResult> DeleteCompany([Required] int companyId, [Required] int orderId)
     {
         try
         {
