@@ -1,0 +1,75 @@
+﻿using AutoMapper;
+using PspPos.Data;
+using PspPos.Infrastructure;
+using PspPos.Models;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.ComponentModel.Design;
+
+namespace PspPos.Services
+{
+    public class ItemsService : IItemsService
+    {
+        private readonly ApplicationContext _context;
+        private readonly IMapper _mapper;
+
+        public ItemsService(ApplicationContext context, IMapper mapper)
+        {
+            _context = context;
+            _mapper = mapper;
+        }
+
+        public async Task Add(Item item)
+        {
+            // TODO: check whether company exists (use cache)
+            await _context.Items.AddAsync(item);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<Item?> Get(Guid companyId, Guid itemId)
+        {
+            // TODO: check whether company exists (use cache)
+            return await _context.Items.FindAsync(itemId);
+
+        }
+
+        public async Task<List<Item>> GetAll(Guid companyId)
+        {
+            // TODO: check whether company exists (use cache)
+
+            //Also idk why I'm doing this filtering...
+            var companyItems = from item in await _context.Items.ToListAsync()
+                               where item.CompanyId == companyId
+                               select item;
+            return companyItems.ToList();
+        }
+
+        public async Task<bool> Delete(Guid companyId, Guid id)
+        {
+            //CompanyId left unused...
+            
+            var item = await _context.Items.FindAsync(id);
+            if (item == null)
+            {
+                return false; // Not found
+            }
+
+            _context.Items.Remove(item);
+
+            await _context.SaveChangesAsync();
+            return true; // Successful
+        }
+
+        public async Task<Item?> Update(Item item)
+        {
+            var itemToUpdate = await Get(item.CompanyId, item.Id);
+            if (itemToUpdate == null)
+            {
+                return null;
+            }
+            itemToUpdate = _mapper.Map<Item>(item);
+            await _context.SaveChangesAsync();
+            return itemToUpdate;
+        }
+    }
+}
