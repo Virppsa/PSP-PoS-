@@ -15,9 +15,9 @@ public class ApplicationContext : DbContext
     public DbSet<Order> Orders => Set<Order>();
     public DbSet<User> Users => Set<User>();
 
-    private HashSet<int>? _availableCompanies = null; 
+    private HashSet<Guid>? _availableCompanies = null; 
 
-    public async Task<HashSet<int>> GetAvailableCompanies()
+    public async Task<HashSet<Guid>> GetAvailableCompanies()
     {
         if(_availableCompanies is null)
         {
@@ -28,7 +28,7 @@ public class ApplicationContext : DbContext
         return _availableCompanies;
     }
 
-    public async Task<bool> CheckIfCompanyExists(int id)
+    public async Task<bool> CheckIfCompanyExists(Guid id)
     {
         var companies = await GetAvailableCompanies();
         if (companies.Contains(id))

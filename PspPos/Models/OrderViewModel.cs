@@ -2,7 +2,7 @@ namespace PspPos.Models;
 
 public class OrderViewModel
 {
-    public int Id { set; get; }
+    public Guid Id { set; get; }
     public int WorkerId { set; get; }
     public int CustomerId { set; get; }
     public int PaymentMethodId { set; get; }

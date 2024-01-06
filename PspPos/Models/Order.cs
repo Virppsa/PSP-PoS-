@@ -2,8 +2,8 @@ namespace PspPos.Models;
 
 public class Order
 {
-    public int CompanyId { get; set; }
-    public int Id { set; get; }
+    public Guid CompanyId { get; set; }
+    public Guid Id { set; get; }
     public int WorkerId { set; get; }
     public int CustomerId { set; get; }
     public int PaymentMethodId { set; get; }
