@@ -41,7 +41,7 @@ public class OrderController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<List<Order>>> GetAllOrders([Required]int companyId)
+    public async Task<ActionResult<List<Order>>> GetAllOrders([Required]Guid companyId)
     {
         try
         {
@@ -57,7 +57,7 @@ public class OrderController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<Order>> CreateOrder([Required]int companyId, [Required] OrderPostModel order)
+    public async Task<ActionResult<Order>> CreateOrder([Required] Guid companyId, [Required] OrderPostModel order)
     {
         //var createdCompany = _mapper.Map<Or>(company);
         var createdOrder = new Order() { CompanyId = companyId };
@@ -70,7 +70,7 @@ public class OrderController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<Company>> GetOrder(int companyId, int orderId)
+    public async Task<ActionResult<Company>> GetOrder(Guid companyId, Guid orderId)
     {
         try
         {
@@ -102,7 +102,7 @@ public class OrderController : ControllerBase
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult> DeleteCompany(int companyId, int orderId)
+    public async Task<ActionResult> DeleteCompany(Guid companyId, Guid orderId)
     {
         try
         {

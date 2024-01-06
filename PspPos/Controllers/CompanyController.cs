@@ -34,7 +34,7 @@ namespace PspPos.Controllers
             return Ok(_mapper.Map<CompanyViewModel>(createdCompany));
         }
         [HttpGet("{companyId}")]
-        public async Task<ActionResult<Company>> GetCompany(int companyId)
+        public async Task<ActionResult<Company>> GetCompany(Guid companyId)
         {
             var company = await _companyService.Get(companyId);
             if (company == null)
@@ -45,7 +45,7 @@ namespace PspPos.Controllers
         }
 
         [HttpPut("{companyId}")]
-        public async Task<ActionResult<Company>> UpdateCompany(int companyId, CompanyPostModel company)
+        public async Task<ActionResult<Company>> UpdateCompany(Guid companyId, CompanyPostModel company)
         {
             var companyUpdateWith = _mapper.Map<Company>(company);
             companyUpdateWith.Id = companyId;
@@ -61,7 +61,7 @@ namespace PspPos.Controllers
         }
 
         [HttpDelete("{companyId}")]
-        public async Task<ActionResult> DeleteCompany(int companyId)
+        public async Task<ActionResult> DeleteCompany(Guid companyId)
         {
             bool deleted = await _companyService.Delete(companyId);
             if (deleted == false)

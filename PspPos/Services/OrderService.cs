@@ -16,13 +16,13 @@ public class OrderService : IOrderService
         _context = context;
     }
 
-    public async Task Add(int companyId, Order order)
+    public async Task Add(Guid companyId, Order order)
     {
         await _context.Orders.AddAsync(order);
         await _context.SaveChangesAsync();
     }
 
-    public async Task<bool> Delete(int companyId, int id)
+    public async Task<bool> Delete(Guid companyId, Guid id)
     {
         var order = await Get(companyId, id);
 
@@ -31,7 +31,7 @@ public class OrderService : IOrderService
         return true;
     }
 
-    public async Task<Order> Get(int companyId, int id)
+    public async Task<Order> Get(Guid companyId, Guid id)
     {
         var orders = await GetAll(companyId);
         var matchingOrder = orders.FirstOrDefault(o => o.Id == id);
@@ -42,7 +42,7 @@ public class OrderService : IOrderService
         return matchingOrder;
     }
 
-    public async Task<List<Order>> GetAll(int companyId)
+    public async Task<List<Order>> GetAll(Guid companyId)
     {
         if (!await _context.CheckIfCompanyExists(companyId))
             throw new NotFoundException($"Company with id={companyId} not found");
@@ -51,7 +51,7 @@ public class OrderService : IOrderService
         return orders.Where(o => o.CompanyId == companyId).ToList();
     }
 
-    public Task<Order> Update(int companyId, Order order)
+    public Task<Order> Update(Guid companyId, Order order)
     {
         throw new NotImplementedException();
     }

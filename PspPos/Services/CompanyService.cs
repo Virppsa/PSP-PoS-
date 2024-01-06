@@ -27,7 +27,7 @@ namespace PspPos.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task<Company?> Get(int id)
+        public async Task<Company?> Get(Guid id)
         {
             return await _context.Companies.FindAsync(id);
         }
@@ -37,7 +37,7 @@ namespace PspPos.Services
             return await _context.Companies.ToListAsync();
         }
 
-        public async Task<bool> Delete(int id)
+        public async Task<bool> Delete(Guid id)
         {
             var company = await _context.Companies.FindAsync(id);
             if (company == null)
