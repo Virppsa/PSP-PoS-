@@ -1,23 +1,38 @@
 ﻿using PspPos.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace PspPos.Data
+namespace PspPos.Data;
+
+public class ApplicationContext : DbContext
 {
-    public class ApplicationContext : DbContext
+    public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options)
     {
-        public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options)
-        {
 
+    }
+
+    public DbSet<Sample> Samples => Set<Sample>();
+    public DbSet<Company> Companies => Set<Company>();
+    public DbSet<Order> Orders => Set<Order>();
+
+    private HashSet<int>? _availableCompanies = null; 
+
+    public async Task<HashSet<int>> GetAvailableCompanies()
+    {
+        if(_availableCompanies is null)
+        {
+            var companies = await Companies.ToListAsync();
+            _availableCompanies = companies.Select(c => c.Id).ToHashSet()!;
         }
 
-        public DbSet<Sample> Samples => Set<Sample>();
-        public DbSet<Company> Companies => Set<Company>();
+        return _availableCompanies;
+    }
 
+    public async Task<bool> CheckIfCompanyExists(int id)
+    {
+        var companies = await GetAvailableCompanies();
+        if (companies.Contains(id))
+            return true;
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<Sample>().ToTable("Samples");
-            modelBuilder.Entity<Company>().ToTable("Companies");
-        }
+        return false;
     }
 }

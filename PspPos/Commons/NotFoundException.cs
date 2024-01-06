@@ -1,0 +1,6 @@
+namespace PspPos.Commons;
+public class NotFoundException : Exception
+{
+    public NotFoundException(string message) : base(message) 
+    { }
+}

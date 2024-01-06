@@ -5,6 +5,7 @@ using PspPos.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.ComponentModel.Design;
+using System.Collections.Concurrent;
 
 namespace PspPos.Services
 {
@@ -22,14 +23,13 @@ namespace PspPos.Services
         public async Task Add(Company company)
         {
             await _context.Companies.AddAsync(company);
+            (await _context.GetAvailableCompanies()).Add(company.Id);
             await _context.SaveChangesAsync();
         }
 
         public async Task<Company?> Get(int id)
         {
-
             return await _context.Companies.FindAsync(id);
-
         }
 
         public async Task<List<Company>> GetAll()
@@ -45,6 +45,8 @@ namespace PspPos.Services
                 return false; // Not found
             }
             _context.Companies.Remove(company);
+
+            (await _context.GetAvailableCompanies()).Remove(id);
 
             await _context.SaveChangesAsync();
             return true; // Successful

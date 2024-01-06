@@ -68,7 +68,8 @@ namespace PspPos.Controllers
             {
                 return NotFound();
             }
-            else { 
+            else 
+            { 
                 return NoContent();
             }
         }

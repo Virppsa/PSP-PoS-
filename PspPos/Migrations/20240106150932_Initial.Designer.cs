@@ -12,8 +12,8 @@ using PspPos.Data;
 namespace PspPos.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20240102195930_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20240106150932_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -41,7 +41,49 @@ namespace PspPos.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Companies", (string)null);
+                    b.ToTable("Companies");
+                });
+
+            modelBuilder.Entity("PspPos.Models.Order", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Appointments")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.Property<double>("Gratuity")
+                        .HasColumnType("float");
+
+                    b.Property<string>("ItemOrders")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("OrderDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("PaymentMethodId")
+                        .HasColumnType("int");
+
+                    b.Property<double>("Tax")
+                        .HasColumnType("float");
+
+                    b.Property<double>("TotalAmount")
+                        .HasColumnType("float");
+
+                    b.Property<int>("WorkerId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("PspPos.Models.Sample", b =>
@@ -60,7 +102,7 @@ namespace PspPos.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Samples", (string)null);
+                    b.ToTable("Samples");
                 });
 #pragma warning restore 612, 618
         }
