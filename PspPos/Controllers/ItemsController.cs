@@ -21,6 +21,8 @@ namespace PspPos.Controllers
             _mapper = mapper;
         }
 
+        // Items CRUD -------------------------------------------------------------------------
+
         [HttpGet("{companyId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -137,5 +139,30 @@ namespace PspPos.Controllers
                 return NotFound(ex.Message);
             }
         }
+
+        // Items add discount -------------------------------------------------------------------------
+
+        [HttpPost("{companyId}/items/{itemId}/discounts")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<ServiceDiscount>> CreateDiscount(Guid companyId, Guid itemId)
+        {
+            try
+            {
+                var discount = new ServiceDiscount();
+
+                await _itemsService.AddDiscount(companyId, itemId, discount);
+
+                return Ok(discount);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
+        // Item option CRUD ---------------------------------------------------------------------------
+
     }
 }

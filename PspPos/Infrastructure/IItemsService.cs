@@ -10,5 +10,6 @@ namespace PspPos.Infrastructure
         public Task<bool> Delete(Guid companyId, Guid itemId);
         public Task<Item?> Update(Item item);
 
+        public Task AddDiscount(Guid companyId, Guid itemId, ServiceDiscount discount);
     }
 }

@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.ComponentModel.Design;
 using PspPos.Commons;
+using Newtonsoft.Json;
 
 namespace PspPos.Services
 {
@@ -103,6 +104,26 @@ namespace PspPos.Services
 
                 await _context.SaveChangesAsync();
                 return itemToUpdate;
+            }
+        }
+
+        public async Task AddDiscount(Guid companyId, Guid itemId, ServiceDiscount discount)
+        {
+            if (await _context.CheckIfCompanyExists(companyId) == false)
+            {
+                throw new NotFoundException($"Company with id={companyId} doesn't exist");
+            }
+            else
+            {
+                var itemToUpdate = await Get(companyId, itemId);
+                if (itemToUpdate == null)
+                {
+                    throw new NotFoundException($"Item with id={itemId} not found");
+                }
+
+                itemToUpdate.SerializedDiscount = JsonConvert.SerializeObject(discount);
+
+                await _context.SaveChangesAsync();
             }
         }
     }
