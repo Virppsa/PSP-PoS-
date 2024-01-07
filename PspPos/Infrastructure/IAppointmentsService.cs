@@ -5,6 +5,7 @@ namespace PspPos.Infrastructure
 {
     public interface IAppointmentsService
     {
+        public Task<bool> CheckIfAppointmentExists(Guid id);
         public Task<IEnumerable<Appointment>> GetAllAsync();
 
         public Task<IEnumerable<Appointment>> GetAllByPropertyAsync(Expression<Func<Appointment, bool>> predicate);

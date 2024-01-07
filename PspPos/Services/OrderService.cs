@@ -88,11 +88,16 @@ public class OrderService : IOrderService
         return orderToUpdate;
     }
 
+    // TODO
+    // test these out!
     private async Task RemoveDeletedAppointments(Guid[] oldAppointments, Guid[] newAppointments)
     {
         var deletedAppointments = await _appointmentsService.GetAllByPropertyAsync(app => oldAppointments.Contains(app.Id) && !newAppointments.Contains(app.Id));
         foreach (var appointment in deletedAppointments)
         {
+            if (!await _appointmentsService.CheckIfAppointmentExists(appointment.Id))
+                throw new NotFoundException($"Could not remove appointment with id={appointment.Id} from order as no such appointmentId exists");
+
             appointment.Taken = false;
             appointment.OrderId = Guid.Empty;
             await _appointmentsService.UpdateAsync(appointment);
@@ -104,6 +109,9 @@ public class OrderService : IOrderService
         var createdAppointments = await _appointmentsService.GetAllByPropertyAsync(app => !oldAppointments.Contains(app.Id) && newAppointments.Contains(app.Id));
         foreach (var appointment in createdAppointments)
         {
+            if (!await _appointmentsService.CheckIfAppointmentExists(appointment.Id))
+                throw new NotFoundException($"Could not add appointment with id={appointment.Id} to order with id={orderId} as no such appointmentId exists");
+
             appointment.Taken = true;
             appointment.OrderId = orderId;
             await _appointmentsService.UpdateAsync(appointment);
