@@ -8,5 +8,6 @@
         public required string EndDate { get; set; }
         public Guid StoreId { get; set; }
         public bool? Taken { get; set; }
+        public Guid? OrderId { get; set; }
     }
 }

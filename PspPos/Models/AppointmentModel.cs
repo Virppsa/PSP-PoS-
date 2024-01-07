@@ -9,7 +9,7 @@
         public bool Taken { get; set; }
         public Guid WorkerId { get; set; }
         public Guid Id { get; set; }
-        public Guid OrderId { get; set; }
+        public Guid? OrderId { get; set; }
         public Guid CompanyId { get; set; }
     }
 }
