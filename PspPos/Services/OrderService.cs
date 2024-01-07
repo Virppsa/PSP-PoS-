@@ -98,8 +98,7 @@ public class OrderService : IOrderService
             if (!await _appointmentsService.CheckIfAppointmentExists(appointment.Id))
                 throw new NotFoundException($"Could not remove appointment with id={appointment.Id} from order as no such appointmentId exists");
 
-            appointment.Taken = false;
-            appointment.OrderId = Guid.Empty;
+            appointment.OrderId = null;
             await _appointmentsService.UpdateAsync(appointment);
         }
     }
@@ -112,7 +111,6 @@ public class OrderService : IOrderService
             if (!await _appointmentsService.CheckIfAppointmentExists(appointment.Id))
                 throw new NotFoundException($"Could not add appointment with id={appointment.Id} to order with id={orderId} as no such appointmentId exists");
 
-            appointment.Taken = true;
             appointment.OrderId = orderId;
             await _appointmentsService.UpdateAsync(appointment);
         }
