@@ -62,6 +62,7 @@ namespace PspPos.Services
         public async Task InsertAsync(Appointment model)
         {
             await _context.Appointments.AddAsync(model);
+            (await GetAvailableAppointments()).Add(model.Id);
             await _context.Instance.SaveChangesAsync();
         }
 
@@ -74,6 +75,7 @@ namespace PspPos.Services
         public async Task DeleteAsync(Appointment model)
         {
             _context.Appointments.Remove(model);
+            (await GetAvailableAppointments()).Remove(model.Id);
             await _context.Instance.SaveChangesAsync();
         }
 
