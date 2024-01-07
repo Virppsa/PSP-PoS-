@@ -16,6 +16,7 @@ public class ApplicationContext : DbContext
     public DbSet<Order> Orders => Set<Order>();
     public DbSet<User> Users => Set<User>();
     public DbSet<Service> Services => Set<Service>();
+    public DbSet<Appointment> Appointments => Set<Appointment>();
 
     private HashSet<Guid>? _availableCompanies = null; 
 
