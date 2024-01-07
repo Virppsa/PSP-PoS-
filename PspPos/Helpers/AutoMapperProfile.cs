@@ -24,6 +24,9 @@ public class AutoMapperProfiles : Profile
 
         CreateMap<InventoryPostModel, Inventory>();
         CreateMap<Inventory, InventoryViewModel>();
+
+        CreateMap<OrderItemPostModel, OrderItem>();
+        CreateMap<OrderItem, OrderItemViewModel>();
     }
 }
 

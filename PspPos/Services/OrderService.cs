@@ -129,6 +129,7 @@ public class OrderService : IOrderService
         else
         {
             var itemOrder = _mapper.Map<OrderItem>(order);
+            itemOrder.CompanyId = companyId;
             await _context.OrderItems.AddAsync(itemOrder);
             await _context.SaveChangesAsync();
             return itemOrder;
