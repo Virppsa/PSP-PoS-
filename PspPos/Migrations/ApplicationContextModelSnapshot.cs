@@ -199,6 +199,66 @@ namespace PspPos.Migrations
                     b.ToTable("Orders");
                 });
 
+            modelBuilder.Entity("PspPos.Models.OrderItem", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CompanyId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ItemId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ItemOptions")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("StoreId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("WorkerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("OrderItems");
+                });
+
+            modelBuilder.Entity("PspPos.Models.Payment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<float?>("LoyaltyDiscount")
+                        .HasColumnType("real");
+
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("PaymentMethod")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PaymentStatus")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<float?>("TotalAmount")
+                        .HasColumnType("real");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Payments");
+                });
+
             modelBuilder.Entity("PspPos.Models.Sample", b =>
                 {
                     b.Property<int>("Id")
@@ -247,31 +307,6 @@ namespace PspPos.Migrations
                     b.ToTable("Services");
                 });
 
-            modelBuilder.Entity("PspPos.Models.Store", b =>
-                {
-                    b.Property<Guid>("Guid")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Address")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("CompanyId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Email")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Phone")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Guid");
-
-                    b.HasIndex("CompanyId");
-
-                    b.ToTable("Stores", (string)null);
-                });
-
             modelBuilder.Entity("PspPos.Models.User", b =>
                 {
                     b.Property<Guid>("GUID")
@@ -307,17 +342,6 @@ namespace PspPos.Migrations
                     b.HasIndex("CompanyId");
 
                     b.ToTable("Users", (string)null);
-                });
-
-            modelBuilder.Entity("PspPos.Models.Store", b =>
-                {
-                    b.HasOne("PspPos.Models.Company", "Company")
-                        .WithMany()
-                        .HasForeignKey("CompanyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Company");
                 });
 
             modelBuilder.Entity("PspPos.Models.User", b =>

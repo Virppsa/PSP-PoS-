@@ -9,24 +9,46 @@ public class PaymentService: IPaymentService
 {
     private readonly ApplicationContext _context;
     private readonly IOrderService _orderService;
+    private readonly IUserService _userService;
 
-    public PaymentService(ApplicationContext context, IOrderService orderService)
+    public PaymentService(ApplicationContext context, IOrderService orderService, IUserService userService)
     {
         _context = context;
         _orderService = orderService;
+        _userService = userService;
     }
 
-    public async Task<Payment> CreateAsync(Guid companyId, Guid orderId, Payment payment)
+    public async Task<Payment> CreateAsync(Guid companyId, PaymentPostModel paymentRequest)
     {
-        payment.OrderId = orderId;
-        var order = await _orderService.Get(companyId, orderId);
+        var order = await _orderService.Get(companyId, paymentRequest.OrderId);
 
         if (order.PaymentId is not null)
             throw new BadHttpRequestException($"Order with id={order.Id} has already processed payment!");
 
-        payment.Id = Guid.NewGuid();
+        User user = await _userService.GetUserByCompanyAndUserID(companyId, paymentRequest.CustomerId);
+
+        if (user.LoyaltyPoints < paymentRequest.LoyaltyPointsToUse)
+            throw new BadHttpRequestException($"Insufficient loyalty points for user");
+    
+        user.LoyaltyPoints -= paymentRequest.LoyaltyPointsToUse;
+        var calculatedLoyaltyDiscount = paymentRequest.LoyaltyPointsToUse / 100;
+
+        Payment payment = new Payment 
+        { 
+        Id = Guid.NewGuid(),
+        LoyaltyDiscount = calculatedLoyaltyDiscount,
+        OrderId = paymentRequest.OrderId,
+        CustomerId = paymentRequest.CustomerId,
+        PaymentMethod = paymentRequest.PaymentMethod,
+        PaymentStatus = "Completed",
+        TotalAmount = paymentRequest.TotalAmount - calculatedLoyaltyDiscount,
+        };
+
         order.PaymentId = payment.Id;
         order.Status = "Completed";
+
+        await _userService.UpdateUser(user.GUID, companyId, new UserPostModel { LoyaltyPoints = user.LoyaltyPoints});
+
         await _orderService.Update(companyId, order.Id, order);
 
         await _context.Payments.AddAsync(payment);
