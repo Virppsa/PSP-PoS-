@@ -19,6 +19,9 @@ public class ApplicationContext : DbContext
     public DbSet<Service> Services => Set<Service>();
     public DbSet<Appointment> Appointments => Set<Appointment>();
     public DbSet<Store> Stores => Set<Store>();
+    public DbSet<ItemOption> ItemOptions => Set<ItemOption>();
+    public DbSet<Inventory> Inventories => Set<Inventory>();
+
 
     private HashSet<Guid>? _availableCompanies = null; 
 
