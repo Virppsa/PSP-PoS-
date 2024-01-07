@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PspPos.Data;
 
@@ -11,9 +12,11 @@ using PspPos.Data;
 namespace PspPos.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20240106220317_Create_items")]
+    partial class Create_items
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -56,9 +59,6 @@ namespace PspPos.Migrations
 
                     b.Property<double?>("Price")
                         .HasColumnType("float");
-
-                    b.Property<string>("SerializedDiscount")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<double?>("Tax")
                         .HasColumnType("float");
@@ -128,35 +128,6 @@ namespace PspPos.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Samples");
-                });
-
-            modelBuilder.Entity("PspPos.Models.Service", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<double>("Price")
-                        .HasColumnType("float");
-
-                    b.Property<string>("SerializedDiscount")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<double>("Tax")
-                        .HasColumnType("float");
-
-                    b.Property<Guid>("companyId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Services");
                 });
 
             modelBuilder.Entity("PspPos.Models.User", b =>
