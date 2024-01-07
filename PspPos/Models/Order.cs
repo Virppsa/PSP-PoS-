@@ -13,7 +13,7 @@ public class Order
     public Guid[] ItemOrders { set; get; } = new Guid[0];
     public DateTime OrderDate { set; get; } = DateTime.Now;
     public string Status { set; get; } = "Placed";
-    public Payment? PaymentInfo { set; get; }
+    public Guid? PaymentId { set; get; }
 
     private string? _receipt;
 }

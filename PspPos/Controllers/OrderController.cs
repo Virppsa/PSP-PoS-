@@ -64,7 +64,8 @@ public class OrderController : ControllerBase
     {
         try
         {
-            return Ok(await _orderService.Add(companyId, order));
+            var mappedOrder = _mapper.Map<Order>(order);
+            return Ok(await _orderService.Add(companyId, mappedOrder));
         }
         catch(NotFoundException ex)
         {
@@ -96,7 +97,8 @@ public class OrderController : ControllerBase
     {
         try
         {
-            return Ok(await _orderService.Update(companyId, orderId, order));
+            var mappedOrder = _mapper.Map<Order>(order);
+            return Ok(await _orderService.Update(companyId, orderId, mappedOrder));
         }
         catch (NotFoundException ex) 
         {

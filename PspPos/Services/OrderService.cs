@@ -20,18 +20,17 @@ public class OrderService : IOrderService
         _mapper = mapper;
     }
 
-    public async Task<Order> Add(Guid companyId, OrderPostModel order)
+    public async Task<Order> Add(Guid companyId, Order order)
     {
         if(!await _context.CheckIfCompanyExists(companyId))
             throw new NotFoundException($"Company with id={companyId} not found");
 
-        var createdOrder = _mapper.Map<Order>(order);
-        createdOrder.CompanyId = companyId;
+        order.CompanyId = companyId;
 
-        await _context.Orders.AddAsync(createdOrder);
+        await _context.Orders.AddAsync(order);
         await _context.SaveChangesAsync();
 
-        return createdOrder;
+        return order;
     }
 
     public async Task<bool> Delete(Guid companyId, Guid id)
@@ -63,7 +62,7 @@ public class OrderService : IOrderService
         return orders.Where(o => o.CompanyId == companyId).ToList();
     }
 
-    public async Task<Order> Update(Guid companyId, Guid orderId, OrderPostModel order)
+    public async Task<Order> Update(Guid companyId, Guid orderId, Order order)
     {
         if (!await _context.CheckIfCompanyExists(companyId))
             throw new NotFoundException($"Company with id={companyId} not found");
