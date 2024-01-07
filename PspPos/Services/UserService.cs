@@ -30,7 +30,7 @@ namespace PspPos.Services
         {
             var user = await _context.Users.FindAsync(userID);
 
-            if (user is null || isUserValid(user, companyID))
+            if (!isUserValid(user, companyID))
             {
                 throw new KeyNotFoundException($"User with ID {userID} or CompanyID {companyID} not found.");
             }
