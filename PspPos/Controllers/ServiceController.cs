@@ -220,11 +220,11 @@ namespace PspPos.Controllers
             var appointment = new Appointment {
                 Id = Guid.NewGuid(),
                 CompanyId = companyId,
-                Taken = false,
                 StartDate = DateTime.Parse(body.StartDate),
                 EndDate = DateTime.Parse(body.EndDate),
                 WorkerId = body.WorkerId,
                 StoreId = body.StoreId,
+                OrderId = body.OrderId,
             };
            
 
@@ -274,7 +274,6 @@ namespace PspPos.Controllers
             {
                 Id = appointmentId,
                 CompanyId = companyId,
-                Taken = body.OrderId is not null,
                 StartDate = DateTime.Parse(body.StartDate),
                 EndDate = DateTime.Parse(body.EndDate),
                 WorkerId = body.WorkerId,
