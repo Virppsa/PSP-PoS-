@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using Newtonsoft.Json;
 using PspPos.Commons;
 using PspPos.Data;
@@ -14,19 +15,21 @@ namespace PspPos.Controllers
     [ApiController]
     public class ServiceController : ControllerBase
     {
-        private readonly IServiceRepository _serviceRepository;
-        //private readonly IAppointmentRepository _appointmentsRepository;
+        private readonly IServiceService _serviceService;
+        //private readonly IAppointmentService _appointmentsRepository;
         private readonly IAppointmentsService _appointmentsService;
         private readonly ApplicationContext _context;
 
-        public ServiceController(IServiceRepository serviceRepository, ApplicationContext context, IAppointmentsService appointmentsService)
+        public ServiceController(IServiceService serviceService, ApplicationContext context, IAppointmentsService appointmentsService)
         {
-            _serviceRepository = serviceRepository;
+            _serviceService = serviceService;
             _appointmentsService = appointmentsService;
-            //_appointmentsService = _appointmentsService;
             _context = context;
         }
 
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpGet("/cinematic/{companyId}/services")]
         public async Task<ActionResult<IEnumerable<Service>>> GetAllServices(Guid companyId)
         {
@@ -39,7 +42,7 @@ namespace PspPos.Controllers
 
             try
             {
-                services = await _serviceRepository.GetAllByPropertyAsync(x => x.companyId == companyId);
+                services = await _serviceService.GetAllByPropertyAsync(x => x.companyId == companyId);
             } 
             catch
             {
@@ -49,7 +52,9 @@ namespace PspPos.Controllers
             return Ok(services);
 
         }
-
+        
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpPost("/cinematic/{companyId}/services")]
         public async Task<ActionResult<Service>> CreateService(ServiceCreateRequest body, Guid companyId)
         {
@@ -60,12 +65,15 @@ namespace PspPos.Controllers
 
             var service = new Service { Id = Guid.NewGuid(), companyId = companyId, Description = body.Description, Price = body.Price, Name = body.Name };
             // calculate tax and add also
-            await _serviceRepository.InsertAsync(service);
+            await _serviceService.InsertAsync(service);
 
-            return StatusCode(StatusCodes.Status200OK);
+            return Ok(service);
 
         }
 
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpGet("/cinematic/{companyId}/services/{serviceId}")]
         public async Task<ActionResult<IEnumerable<Service>>> GetService(Guid companyId, Guid serviceId)
         {
@@ -78,7 +86,7 @@ namespace PspPos.Controllers
 
            try
            {
-               service = await _serviceRepository.GetByPropertyAsync(x => x.companyId == companyId && x.Id == serviceId);
+               service = await _serviceService.GetByPropertyAsync(x => x.companyId == companyId && x.Id == serviceId);
            }
            catch 
            {
@@ -94,6 +102,9 @@ namespace PspPos.Controllers
 
         }
 
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPut("/cinematic/{companyId}/services/{serviceId}")]
         public async Task<ActionResult<Service>> EditService(ServiceCreateRequest body, Guid companyId, Guid serviceId)
         {
@@ -107,7 +118,7 @@ namespace PspPos.Controllers
 
             try 
             {
-                await _serviceRepository.UpdateAsync(service);
+                await _serviceService.UpdateAsync(service);
             }
             catch
             {
@@ -117,7 +128,9 @@ namespace PspPos.Controllers
             return Ok(service);
         }
 
-
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpDelete("/cinematic/{companyId}/services/{serviceId}")]
         public async Task<ActionResult> Delete(Guid companyId, Guid serviceId)
         {
@@ -130,7 +143,7 @@ namespace PspPos.Controllers
 
             try
             {
-                service = await _serviceRepository.GetByPropertyAsync(x => x.Id == serviceId);
+                service = await _serviceService.GetByPropertyAsync(x => x.Id == serviceId);
             }
             catch
             {
@@ -144,7 +157,7 @@ namespace PspPos.Controllers
 
             try
             {
-                await _serviceRepository.DeleteAsync(service);
+                await _serviceService.DeleteAsync(service);
             }
             catch
             {
@@ -154,6 +167,9 @@ namespace PspPos.Controllers
             return StatusCode(StatusCodes.Status204NoContent);
         }
 
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPut("/cinematic/{companyId}/services/{serviceId}/discount")]
         public async Task<ActionResult<ServiceDiscount>> AddDiscountToService(Guid companyId, Guid serviceId)
         {
@@ -162,7 +178,7 @@ namespace PspPos.Controllers
                 return StatusCode(StatusCodes.Status404NotFound, "Provided Company does not exist");
             }
 
-            Service? service = await _serviceRepository.GetByPropertyAsync(x => x.Id == serviceId);
+            Service? service = await _serviceService.GetByPropertyAsync(x => x.Id == serviceId);
             if(service == null)
             {
                 return StatusCode(StatusCodes.Status404NotFound, "Provided Service does not exist");
@@ -170,11 +186,11 @@ namespace PspPos.Controllers
 
             // should be moved to service
             var discount = TaxSystem.CreateDefaultServiceDiscount(serviceId);
-            var serviceWithDiscount = new Service { Id = serviceId, companyId = companyId, Description = service.Description, Price = service.Price, Name = service.Name, Tax = service.Tax, SerializedDiscount =  JsonConvert.SerializeObject(discount) };
+            var serviceWithDiscount = new Service { Id = serviceId, companyId = companyId, Description = service.Description, Price = service.Price, Name = service.Name, Tax = service.Tax, SerializedDiscount = JsonConvert.SerializeObject(discount) };
 
             try
             {
-               await _serviceRepository.UpdateAsync(service);
+               await _serviceService.UpdateAsync(service);
             }
             catch
             {
@@ -184,9 +200,11 @@ namespace PspPos.Controllers
             return Ok(discount);
         }
 
-
-        [HttpGet("/cinematic/{companyId}/appointments/")]
-        public async Task<ActionResult<IEnumerable<GetAppointmentsRequest>>> GetAllAppointments([FromBody]GetAppointmentsRequest request, Guid companyId)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [HttpPost("/cinematic/{companyId}/appointments/get")]
+        public async Task<ActionResult<IEnumerable<GetAppointmentsRequest>>> GetAllAppointments([FromBody] GetAppointmentsRequest request, Guid companyId)
         {
             IEnumerable<Appointment> appointments;
 
@@ -195,10 +213,9 @@ namespace PspPos.Controllers
                 return StatusCode(StatusCodes.Status404NotFound, "Provided Company does not exist");
             }
 
-            // validation for date being defined and parsable needed
             try
             {
-                appointments = await _appointmentsService.GetAllRequestedAppointments(companyId, request.ServiceId, DateTime.Parse(request.LowerDateBoundary), DateTime.Parse(request.HigherDateBoundary));
+                appointments = await _appointmentsService.GetAllRequestedAppointments(companyId, request.ServiceId, request.LowerDateBoundary, request.HigherDateBoundary);
             }
             catch
             {
@@ -208,6 +225,9 @@ namespace PspPos.Controllers
             return Ok(appointments);
         }
 
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPost("/cinematic/{companyId}/appointments")]
         public async Task<ActionResult<Appointment>> CreateAppointment([FromBody] AppointmentCreateRequest body, Guid companyId)
         {
@@ -216,24 +236,28 @@ namespace PspPos.Controllers
                 return StatusCode(StatusCodes.Status404NotFound, "Provided Company does not exist");
             }
 
-            // add validation for dates
-            var appointment = new Appointment {
-                Id = Guid.NewGuid(),
-                CompanyId = companyId,
-                StartDate = DateTime.Parse(body.StartDate),
-                EndDate = DateTime.Parse(body.EndDate),
-                WorkerId = body.WorkerId,
-                StoreId = body.StoreId,
-                OrderId = body.OrderId,
-            };
-           
+            Appointment? appointment;
 
-            await _appointmentsService.InsertAsync(appointment);
+           try
+            {
+                appointment = await _appointmentsService.GetValidatedAppointment(body, companyId, null);
+                await _appointmentsService.InsertAsync(appointment);
+            }
+            catch (NotFoundException)
+            {
+                return NotFound("The service does not exist");
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.InnerException.ToString() ?? ex.Message);
+            }
 
-            return StatusCode(StatusCodes.Status200OK);
-
+            return Ok(appointment);
         }
 
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpGet("/cinematic/{companyId}/appointments/{appointmentId}")]
         public async Task<ActionResult<IEnumerable<Service>>> GetAppointment(Guid companyId, Guid appointmentId)
         {
@@ -253,7 +277,7 @@ namespace PspPos.Controllers
                 return StatusCode(StatusCodes.Status401Unauthorized);
             }
 
-            if (appointment == null)
+            if (appointment is null)
             {
                 return StatusCode(StatusCodes.Status404NotFound);
             }
@@ -261,6 +285,9 @@ namespace PspPos.Controllers
             return Ok(appointment);
         }
 
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPut("/cinematic/{companyId}/appointments/{appointmentId}")]
         public async Task<ActionResult<Appointment>> EditAppointment([FromBody] AppointmentCreateRequest body, Guid companyId, Guid appointmentId)
         {
@@ -269,18 +296,21 @@ namespace PspPos.Controllers
                 return StatusCode(StatusCodes.Status404NotFound, "Provided Company does not exist");
             }
 
-            // validation for dates
-            var appointment = new Appointment
+            Appointment? appointment;
+
+            try
             {
-                Id = appointmentId,
-                CompanyId = companyId,
-                StartDate = DateTime.Parse(body.StartDate),
-                EndDate = DateTime.Parse(body.EndDate),
-                WorkerId = body.WorkerId,
-                StoreId = body.StoreId,
-                OrderId = body.OrderId,
-            };
-           
+                appointment = await _appointmentsService.GetValidatedAppointment(body, companyId, appointmentId);
+            }
+            catch (NotFoundException)
+            {
+                return NotFound("The service does not exist");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
             try
             {
                 await _appointmentsService.UpdateAsync(appointment);
@@ -293,7 +323,9 @@ namespace PspPos.Controllers
             return Ok(appointment);
         }
 
-
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpDelete("/cinematic/{companyId}/appointments/{appointmentId}")]
         public async Task<ActionResult> DeleteAppointment(Guid companyId, Guid appointmentId)
         {

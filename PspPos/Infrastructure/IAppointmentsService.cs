@@ -1,4 +1,5 @@
 ﻿using PspPos.Models;
+using PspPos.Models.DTO.Requests;
 using System.Linq.Expressions;
 
 namespace PspPos.Infrastructure
@@ -20,6 +21,10 @@ namespace PspPos.Infrastructure
 
         public Task DeleteAsync(Appointment model);
 
-        public Task<IEnumerable<Appointment>> GetAllRequestedAppointments(Guid companyId, Guid? serviceId, DateTime? lowerDateBoundary, DateTime? higherDateBoundary);
+        public Task<IEnumerable<Appointment>> GetAllRequestedAppointments(Guid companyId, Guid? serviceId, string? lowerDateBoundary, string? higherDateBoundary);
+
+        public Task<bool> AppointmentsRelationshipsAreValid(Guid companyId, Guid serviceId);
+
+        public Task<Appointment> GetValidatedAppointment(AppointmentCreateRequest appointment, Guid companyId, Guid? appointmentId);
     }
 }
