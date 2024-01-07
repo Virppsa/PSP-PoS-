@@ -23,7 +23,7 @@ public class ApplicationContext : DbContext
     public DbSet<Inventory> Inventories => Set<Inventory>();
 
 
-    private HashSet<Guid>? _availableCompanies = null; 
+    private HashSet<Guid>? _availableCompanies = null;
 
     public async Task<HashSet<Guid>> GetAvailableCompanies()
     {
@@ -44,6 +44,7 @@ public class ApplicationContext : DbContext
 
         return false;
     }
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
