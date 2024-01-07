@@ -16,7 +16,6 @@ namespace PspPos.Services
             _context = context;
         }
 
-
         public async Task<IEnumerable<Appointment>> GetAllAsync()
         {
             return await _context.Appointments.ToListAsync();

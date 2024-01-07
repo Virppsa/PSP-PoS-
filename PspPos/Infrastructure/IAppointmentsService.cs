@@ -18,6 +18,7 @@ namespace PspPos.Infrastructure
         public Task UpdateAsync(Appointment model);
 
         public Task DeleteAsync(Appointment model);
+
         public Task<IEnumerable<Appointment>> GetAllRequestedAppointments(Guid companyId, Guid? serviceId, DateTime? lowerDateBoundary, DateTime? higherDateBoundary);
     }
 }
