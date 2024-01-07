@@ -4,7 +4,6 @@ using PspPos.Models;
 using Microsoft.EntityFrameworkCore;
 using PspPos.Commons;
 using AutoMapper;
-using System.Linq.Expressions;
 
 namespace PspPos.Services;
 
@@ -21,18 +20,17 @@ public class OrderService : IOrderService
         _mapper = mapper;
     }
 
-    public async Task<Order> Add(Guid companyId, OrderPostModel order)
+    public async Task<Order> Add(Guid companyId, Order order)
     {
         if(!await _context.CheckIfCompanyExists(companyId))
             throw new NotFoundException($"Company with id={companyId} not found");
 
-        var createdOrder = _mapper.Map<Order>(order);
-        createdOrder.CompanyId = companyId;
+        order.CompanyId = companyId;
 
-        await _context.Orders.AddAsync(createdOrder);
+        await _context.Orders.AddAsync(order);
         await _context.SaveChangesAsync();
 
-        return createdOrder;
+        return order;
     }
 
     public async Task<bool> Delete(Guid companyId, Guid id)
@@ -64,7 +62,7 @@ public class OrderService : IOrderService
         return orders.Where(o => o.CompanyId == companyId).ToList();
     }
 
-    public async Task<Order> Update(Guid companyId, Guid orderId, OrderPostModel order)
+    public async Task<Order> Update(Guid companyId, Guid orderId, Order order)
     {
         if (!await _context.CheckIfCompanyExists(companyId))
             throw new NotFoundException($"Company with id={companyId} not found");
@@ -73,12 +71,11 @@ public class OrderService : IOrderService
 
         orderToUpdate.WorkerId = order.WorkerId;
         orderToUpdate.CustomerId = order.CustomerId;
-        orderToUpdate.PaymentMethodId = order.PaymentMethodId;
         orderToUpdate.Gratuity = order.Gratuity;
 
-        orderToUpdate.Appointments = order.Appointments;
         await AddNewAppointments(orderToUpdate.Id, orderToUpdate.Appointments, order.Appointments);
         await RemoveDeletedAppointments(orderToUpdate.Appointments, order.Appointments);
+        orderToUpdate.Appointments = order.Appointments;
 
         orderToUpdate.ItemOrders = order.ItemOrders;
         orderToUpdate.Status = order.Status;
@@ -114,6 +111,21 @@ public class OrderService : IOrderService
             appointment.OrderId = orderId;
             await _appointmentsService.UpdateAsync(appointment);
         }
+    }
+
+    public async Task UpdateTotals()
+    {
+        // get totals and receipt
+    }
+
+    public async Task UpdatePaymentInfo(Guid companyId, Guid orderId, PaymentPostModel payment)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async  Task<string> GetReceipt(Guid companyId, Guid orderId)
+    {
+        throw new NotImplementedException();
     }
 
     //NAGLIO Help with itemOrders---------------------------------------
