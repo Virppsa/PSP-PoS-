@@ -9,9 +9,8 @@ namespace PspPos.Models
     {
         [Key]
         public Guid GUID { get; set; }
-        [ForeignKey("Company")]
         public Guid CompanyId { get; set; }
-        public int StoreId { get; set; }
+        public Guid? StoreId { get; set; }
         public string? Role { get; set; }
         public string? Name { get; set; }
         public string? Email { get; set; }
@@ -19,7 +18,7 @@ namespace PspPos.Models
         public string? Address { get; set; }
         public int? LoyaltyPoints { get; set; }
 
-        public virtual Company Company { get; set; }
+        //public virtual Company Company { get; set; }
 
         [NotMapped] // This property is not mapped to the database
         public UserRoles UserRoles

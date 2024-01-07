@@ -66,7 +66,7 @@ namespace PspPos.Controllers
         {
             try
             {
-                return Ok(await _userService.AddUser(userArgs));
+                return Ok(await _userService.AddUser(userArgs, companyID));
             }
             catch (Exception e)
             {

@@ -12,8 +12,8 @@ using PspPos.Data;
 namespace PspPos.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20240107221949_InitialClean")]
-    partial class InitialClean
+    [Migration("20240107225409_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -310,6 +310,31 @@ namespace PspPos.Migrations
                     b.ToTable("Services");
                 });
 
+            modelBuilder.Entity("PspPos.Models.Store", b =>
+                {
+                    b.Property<Guid>("Guid")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("CompanyId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Phone")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Guid");
+
+                    b.HasIndex("CompanyId");
+
+                    b.ToTable("Stores", (string)null);
+                });
+
             modelBuilder.Entity("PspPos.Models.User", b =>
                 {
                     b.Property<Guid>("GUID")
@@ -337,17 +362,15 @@ namespace PspPos.Migrations
                     b.Property<string>("Role")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("StoreId")
-                        .HasColumnType("int");
+                    b.Property<Guid?>("StoreId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("GUID");
 
-                    b.HasIndex("CompanyId");
-
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("PspPos.Models.User", b =>
+            modelBuilder.Entity("PspPos.Models.Store", b =>
                 {
                     b.HasOne("PspPos.Models.Company", "Company")
                         .WithMany()

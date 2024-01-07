@@ -50,11 +50,11 @@ public class ApplicationContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<User>().ToTable("Users");
-        modelBuilder.Entity<User>()
-            .HasOne(u => u.Company)
-            .WithMany()
-            .HasForeignKey(u => u.CompanyId);
+        //modelBuilder.Entity<User>().ToTable("Users");
+        //modelBuilder.Entity<User>()
+        //    .HasOne(u => u.Company)
+        //    .WithMany()
+        //    .HasForeignKey(u => u.CompanyId);
 
         modelBuilder.Entity<Store>().ToTable("Stores");
         modelBuilder.Entity<Store>()
