@@ -1,10 +1,8 @@
 ﻿
-
 namespace PspPos.Models.DTO.Requests
 {
     public class AppointmentCreateRequest 
     { 
-    
         public Guid ServiceId { get; set; }
         public Guid? WorkerId { get; set; }
         public required string StartDate { get; set; }

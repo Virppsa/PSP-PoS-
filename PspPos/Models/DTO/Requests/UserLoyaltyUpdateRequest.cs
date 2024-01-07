@@ -1,5 +1,4 @@
 ﻿
-
 namespace PspPos.Models.DTO.Requests
 {
     public class UserLoyaltyUpdateRequest
