@@ -27,11 +27,16 @@ public class PaymentService: IPaymentService
 
         User user = await _userService.GetUserByCompanyAndUserID(companyId, paymentRequest.CustomerId);
 
-        if (user.LoyaltyPoints < paymentRequest.LoyaltyPointsToUse)
+        if (paymentRequest.LoyaltyPointsToUse is not null && user.LoyaltyPoints < paymentRequest.LoyaltyPointsToUse)
             throw new BadHttpRequestException($"Insufficient loyalty points for user");
-    
-        user.LoyaltyPoints -= paymentRequest.LoyaltyPointsToUse;
-        var calculatedLoyaltyDiscount = paymentRequest.LoyaltyPointsToUse / 100;
+
+        if (paymentRequest.LoyaltyPointsToUse is not null)
+        {
+          user.LoyaltyPoints -= paymentRequest.LoyaltyPointsToUse ?? 0; 
+          await _userService.UpdateUser(user.GUID, companyId, new UserPostModel { LoyaltyPoints = user.LoyaltyPoints});
+        }
+       
+        var calculatedLoyaltyDiscount = paymentRequest.LoyaltyPointsToUse is not null ? paymentRequest.LoyaltyPointsToUse / 100 : 0;
 
         Payment payment = new Payment 
         { 
@@ -46,8 +51,6 @@ public class PaymentService: IPaymentService
 
         order.PaymentId = payment.Id;
         order.Status = "Completed";
-
-        await _userService.UpdateUser(user.GUID, companyId, new UserPostModel { LoyaltyPoints = user.LoyaltyPoints});
 
         await _orderService.Update(companyId, order.Id, order);
 
