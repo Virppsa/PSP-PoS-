@@ -120,4 +120,54 @@ public class OrderController : ControllerBase
             return NotFound(ex.Message);
         }
     }
+
+    //NAGLIO Help with itemOrders---------------------------------------
+    [HttpGet("{companyId}/itemOrders")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<Company>> GetAllItemOrders([Required] Guid companyId, [Required] Guid orderId)
+    {
+        try
+        {
+            throw new NotImplementedException();
+        }
+        catch (NotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+    }
+
+    [HttpGet("{companyId}/itemOrders/{itemOrderId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<Company>> GetItemOrder([Required] Guid companyId, [Required] Guid orderId)
+    {
+        try
+        {
+            throw new NotImplementedException();
+        }
+        catch (NotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+    }
+
+    // /status and /assign PUT endpoints merged into one
+    [HttpPut("{companyId}/itemOrders/{itemOrderId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<Order>> UpdateItemOrder([Required] Guid companyId, [Required] Guid orderId, [Required] OrderPostModel order)
+    {
+        try
+        {
+            throw new NotImplementedException();
+        }
+        catch (NotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+    }
 }
