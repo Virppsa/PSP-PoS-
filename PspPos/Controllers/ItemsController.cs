@@ -4,6 +4,7 @@ using PspPos.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PspPos.Commons;
+using System.Reflection.Metadata.Ecma335;
 
 namespace PspPos.Controllers
 {
@@ -170,11 +171,10 @@ namespace PspPos.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<List<ItemOptionViewModel>>> GetAllItemOptions(Guid companyId)
         {
-            //this is important
             try
             {
-                throw new NotImplementedException();
-
+                var allCompanyItemOptions = await _itemsService.GetAllOptions(companyId);
+                return Ok(_mapper.Map<List<ItemOptionViewModel>>(allCompanyItemOptions));
             }
             catch (NotFoundException ex)
             {
@@ -188,10 +188,14 @@ namespace PspPos.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<ItemOptionViewModel>> CreateItemOption(Guid companyId, ItemOptionPostModel itemOption)
         {
-            //this is important
             try
             {
-                throw new NotImplementedException();
+
+                var createdItemOption = _mapper.Map<ItemOption>(itemOption);
+                createdItemOption.CompanyId = companyId;
+                await _itemsService.AddOption(createdItemOption);
+
+                return Ok(_mapper.Map<ItemOptionViewModel>(createdItemOption));
 
             }
             catch (NotFoundException ex)
@@ -208,8 +212,12 @@ namespace PspPos.Controllers
         {
             try
             {
-                throw new NotImplementedException();
-
+                var itemOption = await _itemsService.GetOption(companyId, itemOptionId);
+                if (itemOption == null)
+                {
+                    return NotFound();
+                }
+                return Ok(_mapper.Map<ItemOptionViewModel>(itemOption));
             }
             catch (NotFoundException ex)
             {
@@ -225,7 +233,19 @@ namespace PspPos.Controllers
         {
             try
             {
-                throw new NotImplementedException();
+
+                var itemOptionUpdateWith = _mapper.Map<ItemOption>(itemOption);
+                itemOptionUpdateWith.Id = itemOptionId;
+                itemOptionUpdateWith.CompanyId = companyId;
+
+                var updatedItemOption = await _itemsService.UpdateOption(itemOptionUpdateWith);
+
+                if (updatedItemOption == null)
+                {
+                    return NotFound();
+                }
+
+                return Ok(_mapper.Map<ItemOptionViewModel>(updatedItemOption));
 
             }
             catch (NotFoundException ex)
@@ -242,8 +262,15 @@ namespace PspPos.Controllers
         {
             try
             {
-                throw new NotImplementedException();
-
+                bool deleted = await _itemsService.DeleteOption(companyId, itemOptionId);
+                if (deleted == false)
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    return NoContent();
+                }
             }
             catch (NotFoundException ex)
             {
@@ -260,7 +287,6 @@ namespace PspPos.Controllers
         public async Task<ActionResult<List<InventoryViewModel>>> GetAllInventories(Guid companyId)
         {
             //LATER should accept query params to filter based on storeId and itemId
-            //important to imolement basic
             try
             {
                 var allInventories = await _itemsService.GetAllInventories(companyId);
@@ -301,8 +327,12 @@ namespace PspPos.Controllers
         {
             try
             {
-                throw new NotImplementedException();
-
+                var inventory = await _itemsService.GetInventory(companyId, inventoryId);
+                if (inventory == null)
+                {
+                    return NotFound();
+                }
+                return Ok(_mapper.Map<InventoryViewModel>(inventory));
             }
             catch (NotFoundException ex)
             {
@@ -318,7 +348,19 @@ namespace PspPos.Controllers
         {
             try
             {
-                throw new NotImplementedException();
+
+                var inventoryUpdateWith = _mapper.Map<Inventory>(inventory);
+                inventoryUpdateWith.Id = inventoryId;
+                inventoryUpdateWith.CompanyId = companyId;
+
+                var updatedInventory = await _itemsService.UpdateInventory(inventoryUpdateWith);
+
+                if (updatedInventory == null)
+                {
+                    return NotFound();
+                }
+
+                return Ok(_mapper.Map<InventoryViewModel>(updatedInventory));
 
             }
             catch (NotFoundException ex)
@@ -335,8 +377,15 @@ namespace PspPos.Controllers
         {
             try
             {
-                throw new NotImplementedException();
-
+                bool deleted = await _itemsService.DeleteInventory(companyId, inventoryId);
+                if (deleted == false)
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    return NoContent();
+                }
             }
             catch (NotFoundException ex)
             {

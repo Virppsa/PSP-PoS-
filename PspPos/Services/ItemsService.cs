@@ -129,27 +129,95 @@ namespace PspPos.Services
         // ItemOption CRUD --------------------------------------------------------------------------
         public async Task AddOption(ItemOption itemOption)
         {
-            throw new NotImplementedException();
+            if (await _context.CheckIfCompanyExists(itemOption.CompanyId) == false)
+            {
+                throw new NotFoundException($"Company with id={itemOption.CompanyId} doesn't exist");
+            }
+            else
+            {
+
+                var item = Get(itemOption.CompanyId, itemOption.ItemId);
+                if (item is null)
+                {
+                    throw new NotFoundException($"Item with id={itemOption.ItemId} doesn't exist");
+                }
+
+                itemOption.Tax = itemOption.Price * TaxSystem.TaxMultiplier;
+                await _context.ItemOptions.AddAsync(itemOption);
+                await _context.SaveChangesAsync();
+            }
         }
 
         public async Task<ItemOption?> GetOption(Guid companyId, Guid itemOptionId)
         {
-            throw new NotImplementedException();
+            if (await _context.CheckIfCompanyExists(companyId) == false)
+            {
+                throw new NotFoundException($"Company with id={companyId} doesn't exist");
+            }
+            else
+            {
+                return await _context.ItemOptions.FindAsync(itemOptionId);
+            }
         }
 
         public async Task<List<ItemOption>> GetAllOptions(Guid companyId)
         {
-            throw new NotImplementedException();
+            if (await _context.CheckIfCompanyExists(companyId) == false)
+            {
+                throw new NotFoundException($"Company with id={companyId} doesn't exist");
+            }
+            else
+            {
+                var companyItemOptions = from itemOption in await _context.ItemOptions.ToListAsync()
+                                   where itemOption.CompanyId == companyId
+                                   select itemOption;
+                return companyItemOptions.ToList();
+            }
         }
 
         public async Task<bool> DeleteOption(Guid companyId, Guid itemOptionId)
         {
-            throw new NotImplementedException();
+            if (await _context.CheckIfCompanyExists(companyId) == false)
+            {
+                throw new NotFoundException($"Company with id={companyId} doesn't exist");
+            }
+            else
+            {
+                var itemOption = await _context.ItemOptions.FindAsync(itemOptionId);
+                if (itemOption == null)
+                {
+                    return false; // Not found
+                }
+
+                _context.ItemOptions.Remove(itemOption);
+
+                await _context.SaveChangesAsync();
+                return true; // Successful
+            }
         }
 
         public async Task<ItemOption?> UpdateOption(ItemOption itemOption)
         {
-            throw new NotImplementedException();
+            if (await _context.CheckIfCompanyExists(itemOption.CompanyId) == false)
+            {
+                throw new NotFoundException($"Company with id={itemOption.CompanyId} doesn't exist");
+            }
+            else
+            {
+                var itemOptionToUpdate = await GetOption(itemOption.CompanyId, itemOption.Id);
+                if (itemOptionToUpdate == null)
+                {
+                    return null;
+                }
+
+                itemOptionToUpdate.ItemId = itemOption.Id;
+                itemOptionToUpdate.Name = itemOption.Name;
+                itemOptionToUpdate.Price = itemOption.Price;
+                itemOptionToUpdate.Tax = itemOption.Price * TaxSystem.TaxMultiplier;
+
+                await _context.SaveChangesAsync();
+                return itemOptionToUpdate;
+            }
         }
 
 
@@ -182,7 +250,14 @@ namespace PspPos.Services
 
         public async Task<Inventory?> GetInventory(Guid companyId, Guid inventoryId)
         {
-            throw new NotImplementedException();
+            if (await _context.CheckIfCompanyExists(companyId) == false)
+            {
+                throw new NotFoundException($"Company with id={companyId} doesn't exist");
+            }
+            else
+            {
+                return await _context.Inventories.FindAsync(inventoryId);
+            }
         }
 
         public async Task<List<Inventory>> GetAllInventories(Guid companyId)
@@ -202,12 +277,47 @@ namespace PspPos.Services
 
         public async Task<bool> DeleteInventory(Guid companyId, Guid inventoryId)
         {
-            throw new NotImplementedException();
+            if (await _context.CheckIfCompanyExists(companyId) == false)
+            {
+                throw new NotFoundException($"Company with id={companyId} doesn't exist");
+            }
+            else
+            {
+                var inventory = await _context.Inventories.FindAsync(inventoryId);
+                if (inventory == null)
+                {
+                    return false; // Not found
+                }
+
+                _context.Inventories.Remove(inventory);
+
+                await _context.SaveChangesAsync();
+                return true; // Successful
+            }
         }
 
-        public async Task<Inventory?> UpdateInventory(Inventory iteminventory)
+        public async Task<Inventory?> UpdateInventory(Inventory inventory)
         {
-            throw new NotImplementedException();
+            if (await _context.CheckIfCompanyExists(inventory.CompanyId) == false)
+            {
+                throw new NotFoundException($"Company with id={inventory.CompanyId} doesn't exist");
+            }
+            else
+            {
+                var inventoryToUpdate = await GetInventory(inventory.CompanyId, inventory.Id);
+                if (inventoryToUpdate == null)
+                {
+                    return null;
+                }
+
+                inventoryToUpdate.StoreId = inventory.StoreId;
+                inventoryToUpdate.ItemId = inventory.ItemId;
+                inventoryToUpdate.Amount = inventory.Amount;
+                inventoryToUpdate.LowStockThreshold = inventory.LowStockThreshold;
+
+                await _context.SaveChangesAsync();
+                return inventoryToUpdate;
+            }
         }
     }
 }
