@@ -117,5 +117,94 @@ public class OrderService : IOrderService
     }
 
     //NAGLIO Help with itemOrders---------------------------------------
+    //Add items to order (id item, store id)
+    //remove items from order (orderITEM ID)
+  
+    public async Task<OrderItem> AddItemOrder(Guid companyId, OrderItemPostModel order)
+    {
+        if (await _context.CheckIfCompanyExists(companyId) == false)
+        {
+            throw new NotFoundException($"Company with id={companyId} doesn't exist");
+        }
+        else
+        {
+            var itemOrder = _mapper.Map<OrderItem>(order);
+            await _context.OrderItems.AddAsync(itemOrder);
+            await _context.SaveChangesAsync();
+            return itemOrder;
+        }
+    }
 
+    public async Task<bool> DeleteItemOrder(Guid companyId, Guid id)
+    {
+        if (await _context.CheckIfCompanyExists(companyId) == false)
+        {
+            throw new NotFoundException($"Company with id={companyId} doesn't exist");
+        }
+        else
+        {
+            var item = await _context.OrderItems.FindAsync(id);
+            if (item == null)
+            {
+                return false; // Not found
+            }
+
+            _context.OrderItems.Remove(item);
+
+            await _context.SaveChangesAsync();
+            return true; // Successful
+        }
+    }
+
+    public async Task<List<OrderItem>> GetAllItemOrders(Guid companyId, Guid storeId)
+    {
+        if (await _context.CheckIfCompanyExists(companyId) == false)
+        {
+            throw new NotFoundException($"Company with id={companyId} doesn't exist");
+        }
+        else
+        {
+            var itemOrders = from itemOrder in await _context.OrderItems.ToListAsync()
+                               where itemOrder.CompanyId == companyId && itemOrder.StoreId == storeId
+                               select itemOrder;
+            return itemOrders.ToList();
+        }
+    }
+
+    public async Task<OrderItem?> GetItemOrder(Guid companyId, Guid id)
+    {
+        if (await _context.CheckIfCompanyExists(companyId) == false)
+        {
+            throw new NotFoundException($"Company with id={companyId} doesn't exist");
+        }
+        else
+        {
+            return await _context.OrderItems.FindAsync(id);
+        }
+    }
+
+    public async Task<OrderItem> UpdateItemOrder(Guid companyId, Guid id, OrderItemPostModel order)
+    {
+        if (await _context.CheckIfCompanyExists(companyId) == false)
+        {
+            throw new NotFoundException($"Company with id={companyId} doesn't exist");
+        }
+        else
+        {
+            var itemToUpdate = await GetItemOrder(companyId, id);
+            if (itemToUpdate == null)
+            {
+                return null;
+            }
+
+            itemToUpdate.ItemId = order.ItemId;
+            itemToUpdate.StoreId = order.StoreId;
+            itemToUpdate.ItemOptions = order.ItemOptions;
+            itemToUpdate.Status = order.Status;
+            itemToUpdate.WorkerId = order.WorkerId;
+
+            await _context.SaveChangesAsync();
+            return itemToUpdate;
+        }
+    }
 }

@@ -4,15 +4,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PspPos.Models
 {
-    public class OrderItem
+    public class OrderItemPostModel
     {
-        public Guid Id { set; get; }
-        public Guid CompanyId { set; get; }
         public Guid ItemId { set; get; }
         public Guid StoreId { set; get; }
         public List<Guid>? ItemOptions { set; get; }
-
-        public string? Status { set; get; } = "Placed";
+        public string? Status { set; get; }
         public Guid WorkerId { set; get; }
     }
 }
