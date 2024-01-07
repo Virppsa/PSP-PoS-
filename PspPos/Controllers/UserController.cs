@@ -10,7 +10,7 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 namespace PspPos.Controllers
 {
     [ApiController]
-    [Route("cinematic/[controller]")]
+    [Route("cinematic/")]
     public class UserController : ControllerBase
     {
 
@@ -23,7 +23,7 @@ namespace PspPos.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet("/{companyID}/users")]
+        [HttpGet("{companyID}/users")]
         public async Task<ActionResult<List<User>>> GetCompanyUsers([Required] Guid companyID)
         {
             try
@@ -42,7 +42,7 @@ namespace PspPos.Controllers
             }
         }
 
-        [HttpGet("/{companyID}/users/{userID}")]
+        [HttpGet("{companyID}/users/{userID}")]
         public async Task<ActionResult<User>> GetCompanyUserByUserID([Required] Guid companyID, [Required] Guid userID)
         {
             try
@@ -61,7 +61,7 @@ namespace PspPos.Controllers
             }
         }
 
-        [HttpPost("/{companyID}/users")]
+        [HttpPost("{companyID}/users")]
         public async Task<ActionResult> CreateUser([Required] Guid companyID, [Required] UserPostModel userArgs)
         {
             try
@@ -75,7 +75,7 @@ namespace PspPos.Controllers
             }
         }
 
-        [HttpPut("/{companyID}/users/{userID}")]
+        [HttpPut("{companyID}/users/{userID}")]
         public async Task<ActionResult<User>> UpdateUser([Required] Guid companyID, [Required] Guid userID, [Required] UserPostModel userArgs)
         {
             try
@@ -89,7 +89,7 @@ namespace PspPos.Controllers
             }
         }
 
-        [HttpDelete("/{companyID}/users/{userID}")]
+        [HttpDelete("{companyID}/users/{userID}")]
         public async Task<ActionResult> DeleteUser([Required] Guid companyID, [Required] Guid userID)
         {
             try
@@ -105,7 +105,7 @@ namespace PspPos.Controllers
             }
         }
 
-        [HttpGet("/{companyID}/users/{userID}/loyalty")]
+        [HttpGet("{companyID}/users/{userID}/loyalty")]
         public async Task<ActionResult<int>> GetUserLoyaltyPoints([Required] Guid companyID, [Required] Guid userID)
         {
             try
@@ -124,7 +124,7 @@ namespace PspPos.Controllers
             }
         }
 
-        [HttpPut("/{companyID}/users/{userID}/loyalty")]
+        [HttpPut("{companyID}/users/{userID}/loyalty")]
         public async Task<ActionResult> UpdateUserLoyaltyPoints([Required] Guid companyID, [Required] Guid userID, UserLoyaltyUpdateRequest request)
         {
             try
