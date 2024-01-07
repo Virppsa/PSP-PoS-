@@ -4,17 +4,20 @@ using PspPos.Models;
 using Microsoft.EntityFrameworkCore;
 using PspPos.Commons;
 using AutoMapper;
+using System.Linq.Expressions;
 
 namespace PspPos.Services;
 
 public class OrderService : IOrderService
 {
     private readonly ApplicationContext _context;
+    private readonly IAppointmentsService _appointmentsService;
     private readonly IMapper _mapper;
 
-    public OrderService(ApplicationContext context, IMapper mapper)
+    public OrderService(ApplicationContext context, IAppointmentsService appointmentsService, IMapper mapper)
     {
         _context = context;
+        _appointmentsService = appointmentsService;
         _mapper = mapper;
     }
 
@@ -72,12 +75,38 @@ public class OrderService : IOrderService
         orderToUpdate.CustomerId = order.CustomerId;
         orderToUpdate.PaymentMethodId = order.PaymentMethodId;
         orderToUpdate.Gratuity = order.Gratuity;
+
         orderToUpdate.Appointments = order.Appointments;
+        await AddNewAppointments(orderToUpdate.Id, orderToUpdate.Appointments, order.Appointments);
+        await RemoveDeletedAppointments(orderToUpdate.Appointments, order.Appointments);
+
         orderToUpdate.ItemOrders = order.ItemOrders;
         orderToUpdate.Status = order.Status;
 
         await _context.SaveChangesAsync();
 
         return orderToUpdate;
+    }
+
+    private async Task RemoveDeletedAppointments(Guid[] oldAppointments, Guid[] newAppointments)
+    {
+        var deletedAppointments = await _appointmentsService.GetAllByPropertyAsync(app => oldAppointments.Contains(app.Id) && !newAppointments.Contains(app.Id));
+        foreach (var appointment in deletedAppointments)
+        {
+            appointment.Taken = false;
+            appointment.OrderId = Guid.Empty;
+            await _appointmentsService.UpdateAsync(appointment);
+        }
+    }
+
+    private async Task AddNewAppointments(Guid orderId, Guid[] oldAppointments, Guid[] newAppointments)
+    {
+        var createdAppointments = await _appointmentsService.GetAllByPropertyAsync(app => !oldAppointments.Contains(app.Id) && newAppointments.Contains(app.Id));
+        foreach (var appointment in createdAppointments)
+        {
+            appointment.Taken = true;
+            appointment.OrderId = orderId;
+            await _appointmentsService.UpdateAsync(appointment);
+        }
     }
 }
