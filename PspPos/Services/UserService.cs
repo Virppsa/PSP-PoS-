@@ -4,6 +4,7 @@ using PspPos.Infrastructure;
 using PspPos.Models;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.Design;
+using PspPos.Models.DTO.Requests;
 
 namespace PspPos.Services
 {
@@ -29,7 +30,7 @@ namespace PspPos.Services
         {
             var user = await _context.Users.FindAsync(userID);
 
-            if (isUserValid(user, companyID))
+            if (user is null || isUserValid(user, companyID))
             {
                 throw new KeyNotFoundException($"User with ID {userID} or CompanyID {companyID} not found.");
             }
@@ -39,7 +40,7 @@ namespace PspPos.Services
 
         public async Task<User> AddUser(UserPostModel user)
         {
-            if (user == null)
+            if (user is null)
             {
                 throw new ArgumentNullException(nameof(user));
             }
@@ -55,15 +56,31 @@ namespace PspPos.Services
         public async Task<User> UpdateUser(Guid userID, Guid companyID, UserPostModel updatedUser)
         {
             var existingUser = await _context.Users.FindAsync(userID);
-            if (isUserValid(existingUser, companyID))
+            if (!isUserValid(existingUser, companyID))
             {
                 throw new KeyNotFoundException($"User with ID {userID} or CompanyID {companyID} not found.");
             }
 
-            existingUser.Email = updatedUser.Email;
+            existingUser!.Email = updatedUser.Email;
             existingUser.Phone = updatedUser.Phone;
             existingUser.Address = updatedUser.Address;
             existingUser.Role = updatedUser.Role;
+            existingUser.LoyaltyPoints = updatedUser.LoyaltyPoints;
+
+            await _context.SaveChangesAsync();
+
+            return existingUser;
+        }
+
+        public async Task<User> UpdateUserLoyalty(Guid userID, Guid companyID, UserLoyaltyUpdateRequest updatedUser)
+        {
+            var existingUser = await _context.Users.FindAsync(userID);
+            if (!isUserValid(existingUser, companyID))
+            {
+                throw new KeyNotFoundException($"User with ID {userID} or CompanyID {companyID} not found.");
+            }
+
+            existingUser!.LoyaltyPoints = updatedUser.LoyaltyPoints;
 
             await _context.SaveChangesAsync();
 
@@ -73,7 +90,7 @@ namespace PspPos.Services
         public async Task DeleteUser(Guid userID, Guid companyID)
         {
             var existingUser = await _context.Users.FindAsync(userID);
-            if (isUserValid(existingUser, companyID))
+            if (!isUserValid(existingUser, companyID))
             {
                 throw new KeyNotFoundException($"User with ID {userID} or CompanyID {companyID} not found.");
             }
@@ -83,7 +100,7 @@ namespace PspPos.Services
             await _context.SaveChangesAsync();
         }
 
-        private bool isUserValid(User user, Guid companyID)
+        private bool isUserValid(User? user, Guid companyID)
         {
             return user is not null && companyID == user.CompanyId;
         }

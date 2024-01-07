@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using PspPos.Infrastructure;
 using PspPos.Models;
+using PspPos.Models.DTO.Requests;
 using PspPos.Services;
 using System.ComponentModel.DataAnnotations;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
@@ -104,5 +105,37 @@ namespace PspPos.Controllers
             }
         }
 
+        [HttpGet("/{companyID}/users/{userID}/loyalty")]
+        public async Task<ActionResult<int>> GetUserLoyaltyPoints([Required] Guid companyID, [Required] Guid userID)
+        {
+            try
+            {
+                var user = await _userService.GetUserByCompanyAndUserID(companyID, userID);
+                if (user is null)
+                {
+                    return NotFound($"No users found for company ID: {companyID} and with user ID: {userID}");
+                }
+                return Ok(user.LoyaltyPoints ?? 0);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                                  "Error retrieving data from the database" + e);
+            }
+        }
+
+        [HttpPut("/{companyID}/users/{userID}/loyalty")]
+        public async Task<ActionResult> UpdateUserLoyaltyPoints([Required] Guid companyID, [Required] Guid userID, UserLoyaltyUpdateRequest request)
+        {
+            try
+            {
+                return Ok(await _userService.UpdateUserLoyalty(userID, companyID, request));
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                                  "Error updating user" + e);
+            }
+        }
     }
 }

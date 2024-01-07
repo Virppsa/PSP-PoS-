@@ -168,8 +168,8 @@ namespace PspPos.Migrations
                     b.Property<Guid>("CompanyId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("CustomerId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<double>("Gratuity")
                         .HasColumnType("float");
@@ -190,8 +190,8 @@ namespace PspPos.Migrations
                     b.Property<double>("TotalAmount")
                         .HasColumnType("float");
 
-                    b.Property<int>("WorkerId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("WorkerId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -246,6 +246,31 @@ namespace PspPos.Migrations
                     b.ToTable("Services");
                 });
 
+            modelBuilder.Entity("PspPos.Models.Store", b =>
+                {
+                    b.Property<Guid>("Guid")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("CompanyId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Phone")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Guid");
+
+                    b.HasIndex("CompanyId");
+
+                    b.ToTable("Stores", (string)null);
+                });
+
             modelBuilder.Entity("PspPos.Models.User", b =>
                 {
                     b.Property<Guid>("GUID")
@@ -260,6 +285,9 @@ namespace PspPos.Migrations
 
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("LoyaltyPoints")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
@@ -278,6 +306,17 @@ namespace PspPos.Migrations
                     b.HasIndex("CompanyId");
 
                     b.ToTable("Users", (string)null);
+                });
+
+            modelBuilder.Entity("PspPos.Models.Store", b =>
+                {
+                    b.HasOne("PspPos.Models.Company", "Company")
+                        .WithMany()
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Company");
                 });
 
             modelBuilder.Entity("PspPos.Models.User", b =>

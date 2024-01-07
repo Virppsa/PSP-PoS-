@@ -18,6 +18,7 @@ public class ApplicationContext : DbContext
     public DbSet<Item> Items => Set<Item>();
     public DbSet<Service> Services => Set<Service>();
     public DbSet<Appointment> Appointments => Set<Appointment>();
+    public DbSet<Store> Stores => Set<Store>();
     public DbSet<ItemOption> ItemOptions => Set<ItemOption>();
     public DbSet<Inventory> Inventories => Set<Inventory>();
 
@@ -48,6 +49,12 @@ public class ApplicationContext : DbContext
     {
         modelBuilder.Entity<User>().ToTable("Users");
         modelBuilder.Entity<User>()
+            .HasOne(u => u.Company)
+            .WithMany()
+            .HasForeignKey(u => u.CompanyId);
+
+        modelBuilder.Entity<Store>().ToTable("Stores");
+        modelBuilder.Entity<Store>()
             .HasOne(u => u.Company)
             .WithMany()
             .HasForeignKey(u => u.CompanyId);
