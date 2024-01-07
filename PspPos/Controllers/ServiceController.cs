@@ -1,14 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage.Json;
 using Newtonsoft.Json;
 using PspPos.Commons;
 using PspPos.Data;
 using PspPos.Models;
 using PspPos.Models.DTO.Requests;
 using PspPos.Repositories;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+using PspPos.Services;
 
 namespace PspPos.Controllers
 {
@@ -17,17 +14,18 @@ namespace PspPos.Controllers
     public class ServiceController : ControllerBase
     {
         private readonly IServiceRepository _serviceRepository;
-        // private readonly IAppointmentRepository _appointmentRepository;
+        //private readonly IAppointmentRepository _appointmentsService;
+        private readonly AppointmentsService _appointmentsService;
         private readonly ApplicationContext _context;
 
-        public ServiceController(IServiceRepository serviceRepository/*, IAppointmentRepository appointmentRepository*/, ApplicationContext context)
+        public ServiceController(IServiceRepository serviceRepository, ApplicationContext context, AppointmentsService appointmentsService)
         {
             _serviceRepository = serviceRepository;
-            // _appointmentRepository = appointmentRepository;
+            _appointmentsService = appointmentsService;
+            //_appointmentsService = _appointmentsService;
             _context = context;
         }
 
-        // GET: api/<ServiceController>
         [HttpGet("/cinematic/{companyId}/services")]
         public async Task<ActionResult<IEnumerable<Service>>> GetAllServices(Guid companyId)
         {
@@ -42,7 +40,7 @@ namespace PspPos.Controllers
             {
                 services = await _serviceRepository.GetAllByPropertyAsync(x => x.companyId == companyId);
             } 
-            catch (Exception ex)
+            catch
             {
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
@@ -51,7 +49,6 @@ namespace PspPos.Controllers
 
         }
 
-        // POST api/<ServiceController>
         [HttpPost("/cinematic/{companyId}/services")]
         public async Task<ActionResult<Service>> CreateService(ServiceCreateRequest body, Guid companyId)
         {
@@ -63,8 +60,6 @@ namespace PspPos.Controllers
             var service = new Service { Id = Guid.NewGuid(), companyId = companyId, Description = body.Description, Price = body.Price, Name = body.Name };
             // calculate tax and add also
             await _serviceRepository.InsertAsync(service);
-
-           
 
             return StatusCode(StatusCodes.Status200OK);
 
@@ -186,6 +181,152 @@ namespace PspPos.Controllers
             }
 
             return Ok(discount);
+        }
+
+
+        [HttpGet("/cinematic/{companyId}/appointments/")]
+        public async Task<ActionResult<IEnumerable<GetAppointmentsRequest>>> GetAllAppointments([FromBody]GetAppointmentsRequest request, Guid companyId)
+        {
+            IEnumerable<Appointment> appointments;
+
+            if (await _context.CheckIfCompanyExists(companyId))
+            {
+                return StatusCode(StatusCodes.Status404NotFound, "Provided Company does not exist");
+            }
+
+            // validation for date being defined and parsable needed
+            try
+            {
+                appointments = await _appointmentsService.GetAllRequestedAppointments(companyId, request.ServiceId, DateTime.Parse(request.LowerDateBoundary), DateTime.Parse(request.HigherDateBoundary));
+            }
+            catch
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+
+            return Ok(appointments);
+        }
+
+        [HttpPost("/cinematic/{companyId}/appointments")]
+        public async Task<ActionResult<Appointment>> CreateAppointment([FromBody] AppointmentCreateRequest body, Guid companyId)
+        {
+            if (await _context.CheckIfCompanyExists(companyId))
+            {
+                return StatusCode(StatusCodes.Status404NotFound, "Provided Company does not exist");
+            }
+
+            // add validation for dates
+            var appointment = new Appointment {
+                Id = Guid.NewGuid(),
+                CompanyId = companyId,
+                Taken = false,
+                StartDate = DateTime.Parse(body.StartDate),
+                EndDate = DateTime.Parse(body.EndDate),
+                WorkerId = body.WorkerId,
+                StoreId = body.StoreId,
+            };
+           
+
+            await _appointmentsService.InsertAsync(appointment);
+
+            return StatusCode(StatusCodes.Status200OK);
+
+        }
+
+        [HttpGet("/cinematic/{companyId}/appointments/{appointmentId}")]
+        public async Task<ActionResult<IEnumerable<Service>>> GetAppointment(Guid companyId, Guid appointmentId)
+        {
+            Appointment? appointment;
+
+            if (await _context.CheckIfCompanyExists(companyId))
+            {
+                return StatusCode(StatusCodes.Status404NotFound, "Provided Company does not exist");
+            }
+
+            try
+            {
+                appointment = await _appointmentsService.GetByPropertyAsync(x => x.CompanyId == companyId && x.Id == appointmentId);
+            }
+            catch
+            {
+                return StatusCode(StatusCodes.Status401Unauthorized);
+            }
+
+            if (appointment == null)
+            {
+                return StatusCode(StatusCodes.Status404NotFound);
+            }
+
+            return Ok(appointment);
+        }
+
+        [HttpPut("/cinematic/{companyId}/appointments/{appointmentId}")]
+        public async Task<ActionResult<Appointment>> EditAppointment([FromBody] AppointmentCreateRequest body, Guid companyId, Guid appointmentId)
+        {
+            if (await _context.CheckIfCompanyExists(companyId))
+            {
+                return StatusCode(StatusCodes.Status404NotFound, "Provided Company does not exist");
+            }
+
+            // validation for dates
+            var appointment = new Appointment
+            {
+                Id = appointmentId,
+                CompanyId = companyId,
+                Taken = body.Taken ?? false,
+                StartDate = DateTime.Parse(body.StartDate),
+                EndDate = DateTime.Parse(body.EndDate),
+                WorkerId = body.WorkerId,
+                StoreId = body.StoreId,
+            };
+           
+            try
+            {
+                await _appointmentsService.UpdateAsync(appointment);
+            }
+            catch
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Failed to Update Appointment");
+            }
+
+            return Ok(appointment);
+        }
+
+
+        [HttpDelete("/cinematic/{companyId}/appointments/{appointmentId}")]
+        public async Task<ActionResult> DeleteAppointment(Guid companyId, Guid appointmentId)
+        {
+            if (await _context.CheckIfCompanyExists(companyId))
+            {
+                return StatusCode(StatusCodes.Status404NotFound, "Provided Company does not exist");
+            }
+
+            Appointment? appointment;
+
+            try
+            {
+                appointment = await _appointmentsService.GetByPropertyAsync(x => x.Id == appointmentId);
+            }
+            catch
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+
+            if (appointment == null)
+            {
+                return StatusCode(StatusCodes.Status404NotFound);
+            }
+
+            try
+            {
+                await _appointmentsService.DeleteAsync(appointment);
+            }
+            catch
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+
+            return StatusCode(StatusCodes.Status204NoContent);
         }
     }
 }

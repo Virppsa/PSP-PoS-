@@ -2,6 +2,7 @@
 using PspPos.Infrastructure;
 using PspPos.Services;
 using Microsoft.EntityFrameworkCore;
+using PspPos.Repositories;
 
 namespace PspPos.Commons;
 public static class DependencyInjection
@@ -27,7 +28,12 @@ public static class DependencyInjection
         services.AddScoped<ICompanyService, CompanyService>();
         services.AddScoped<IOrderService, OrderService>();
         services.AddScoped<IUserService, UserService>();
+
+        services.AddScoped<IAppointmentsService, AppointmentsService>();
+        services.AddScoped<IServiceRepository, ServiceRepository>();
+
         services.AddScoped<IItemsService, ItemsService>();
+
 
         return services;
     }

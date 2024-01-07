@@ -1,15 +1,17 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using PspPos.Data;
+using PspPos.Infrastructure;
 using PspPos.Models;
 using System.Linq.Expressions;
 
-namespace PspPos.Repositories
+namespace PspPos.Services
 {
-    public class AppointmentRepository : IAppointmentRepository
+    public class AppointmentsService: IAppointmentsService
     {
         private readonly ApplicationContext _context;
 
-        public AppointmentRepository(ApplicationContext context)
+        public AppointmentsService(ApplicationContext context)
         {
             _context = context;
         }
@@ -50,6 +52,24 @@ namespace PspPos.Repositories
         {
             _context.Appointments.Remove(model);
             await _context.Instance.SaveChangesAsync();
+        }
+
+        // builds dynamic query based on parameters
+        public async Task<IEnumerable<Appointment>> GetAllRequestedAppointments(Guid companyId, Guid? serviceId, DateTime? lowerDateBoundary, DateTime? higherDateBoundary )
+        {
+            var companiesAppointments = await GetAllByPropertyAsync(x => x.CompanyId == companyId);
+           
+            if (serviceId is not null) 
+            {
+                companiesAppointments = companiesAppointments.Where(x => x.ServiceId == serviceId);
+            }
+
+            if(lowerDateBoundary is not null && higherDateBoundary is not null)
+            {
+                companiesAppointments = companiesAppointments.Where(x => x.StartDate <= lowerDateBoundary && x.EndDate >= higherDateBoundary);
+            }
+
+            return companiesAppointments.ToList();
         }
     }
 }

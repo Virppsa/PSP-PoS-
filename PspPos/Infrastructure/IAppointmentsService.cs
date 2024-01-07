@@ -1,9 +1,9 @@
 ﻿using PspPos.Models;
 using System.Linq.Expressions;
 
-namespace PspPos.Repositories
+namespace PspPos.Infrastructure
 {
-    public interface IAppointmentRepository
+    public interface IAppointmentsService
     {
         public Task<IEnumerable<Appointment>> GetAllAsync();
 
@@ -18,5 +18,7 @@ namespace PspPos.Repositories
         public Task UpdateAsync(Appointment model);
 
         public Task DeleteAsync(Appointment model);
+
+        public Task<IEnumerable<Appointment>> GetAllRequestedAppointments(Guid companyId, Guid? serviceId, DateTime? lowerDateBoundary, DateTime? higherDateBoundary);
     }
 }

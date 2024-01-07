@@ -85,7 +85,7 @@ namespace PspPos.Services
 
         private bool isUserValid(User user, Guid companyID)
         {
-            return user != null && companyID == user.CompanyId;
+            return user is not null && companyID == user.CompanyId;
         }
     }
 }
