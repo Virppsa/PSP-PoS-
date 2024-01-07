@@ -12,8 +12,8 @@ using PspPos.Data;
 namespace PspPos.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20240106220317_Create_items")]
-    partial class Create_items
+    [Migration("20240107110428_create_inventory_and_itemoptions")]
+    partial class create_inventory_and_itemoptions
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -42,6 +42,32 @@ namespace PspPos.Migrations
                     b.ToTable("Companies");
                 });
 
+            modelBuilder.Entity("PspPos.Models.Inventory", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Amount")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("CompanyId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ItemId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("LowStockThreshold")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("StoreId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Inventories");
+                });
+
             modelBuilder.Entity("PspPos.Models.Item", b =>
                 {
                     b.Property<Guid>("Id")
@@ -60,12 +86,41 @@ namespace PspPos.Migrations
                     b.Property<double?>("Price")
                         .HasColumnType("float");
 
+                    b.Property<string>("SerializedDiscount")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<double?>("Tax")
                         .HasColumnType("float");
 
                     b.HasKey("Id");
 
                     b.ToTable("Items");
+                });
+
+            modelBuilder.Entity("PspPos.Models.ItemOption", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CompanyId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ItemId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double?>("Price")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("Tax")
+                        .HasColumnType("float");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ItemOptions");
                 });
 
             modelBuilder.Entity("PspPos.Models.Order", b =>
@@ -128,6 +183,35 @@ namespace PspPos.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Samples");
+                });
+
+            modelBuilder.Entity("PspPos.Models.Service", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("Price")
+                        .HasColumnType("float");
+
+                    b.Property<string>("SerializedDiscount")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("Tax")
+                        .HasColumnType("float");
+
+                    b.Property<Guid>("companyId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Services");
                 });
 
             modelBuilder.Entity("PspPos.Models.User", b =>

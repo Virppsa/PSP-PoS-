@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using PspPos.Models.Enums;
+using System.Data;
 
 namespace PspPos.Models
 {
@@ -18,6 +20,13 @@ namespace PspPos.Models
         public int? LoyaltyPoints { get; set; }
 
         public virtual Company Company { get; set; }
+
+        [NotMapped] // This property is not mapped to the database
+        public UserRoles UserRoles
+        {
+            get => Enum.TryParse<UserRoles>(Role, out var roleEnum) ? roleEnum : default;
+            set => Role = value.ToString();
+        }
     }
 
 }
