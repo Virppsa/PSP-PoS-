@@ -5,6 +5,7 @@ using PspPos.Infrastructure;
 using System.ComponentModel.Design;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
+using PspPos.Commons;
 
 namespace PspPos.Services
 {
@@ -32,7 +33,7 @@ namespace PspPos.Services
 
             if (!isStoreValid(store, companyID))
             {
-                throw new KeyNotFoundException($"Store with ID {storeID} or CompanyID {companyID} not found.");
+                throw new NotFoundException($"Store with ID {storeID} not found.");
             }
 
             return store;
@@ -58,7 +59,7 @@ namespace PspPos.Services
             var existingStore = await _context.Stores.FindAsync(storeID);
             if (existingStore == null)
             {
-                throw new KeyNotFoundException($"Store with ID {storeID} not found.");
+                throw new NotFoundException($"Store with ID {storeID} not found.");
             }
 
             existingStore = _mapper.Map<Store>(existingStore);
@@ -73,7 +74,7 @@ namespace PspPos.Services
             var existingStore = await _context.Stores.FindAsync(storeID);
             if (existingStore == null)
             {
-                throw new KeyNotFoundException($"Store with ID {storeID} not found.");
+                throw new NotFoundException($"Store with ID {storeID} not found.");
             }
 
             if (existingStore.CompanyId == companyID)
