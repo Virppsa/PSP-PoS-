@@ -26,7 +26,7 @@ public class PaymentController : ControllerBase
     // Refund payment - reset order and payment status
     // Get receipt, probably from order
 
-    [HttpPut("{companyId}")]
+    [HttpPut("{companyId}/receive")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -40,6 +40,48 @@ public class PaymentController : ControllerBase
         catch (NotFoundException ex)
         {
             return NotFound(ex.Message);
+        }
+        catch (BadHttpRequestException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpGet("{companyId}/get")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<Payment>> GetPayment([Required] Guid companyId, [Required] Guid paymentId)
+    {
+        try
+        {
+            // TODO:
+            // idk if we should check if payment is valid, what if the cashier is super chill and cool
+            return Ok(await _paymentService.GetAsync(companyId, paymentId));
+        }
+        catch (NotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+    }
+
+    [HttpPut("{companyId}/refund")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<Payment>> RefundPayment([Required] Guid companyId, [Required] Guid paymentId)
+    {
+        try
+        {
+            return Ok(await _paymentService.RefundAsync(companyId, paymentId));
+        }
+        catch (NotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (BadHttpRequestException ex)
+        {
+            return BadRequest(ex.Message);
         }
     }
 }
