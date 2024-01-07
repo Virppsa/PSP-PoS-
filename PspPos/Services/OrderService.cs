@@ -4,7 +4,6 @@ using PspPos.Models;
 using Microsoft.EntityFrameworkCore;
 using PspPos.Commons;
 using AutoMapper;
-using System.Linq.Expressions;
 
 namespace PspPos.Services;
 
@@ -73,12 +72,11 @@ public class OrderService : IOrderService
 
         orderToUpdate.WorkerId = order.WorkerId;
         orderToUpdate.CustomerId = order.CustomerId;
-        orderToUpdate.PaymentMethodId = order.PaymentMethodId;
         orderToUpdate.Gratuity = order.Gratuity;
 
-        orderToUpdate.Appointments = order.Appointments;
         await AddNewAppointments(orderToUpdate.Id, orderToUpdate.Appointments, order.Appointments);
         await RemoveDeletedAppointments(orderToUpdate.Appointments, order.Appointments);
+        orderToUpdate.Appointments = order.Appointments;
 
         orderToUpdate.ItemOrders = order.ItemOrders;
         orderToUpdate.Status = order.Status;
@@ -98,8 +96,7 @@ public class OrderService : IOrderService
             if (!await _appointmentsService.CheckIfAppointmentExists(appointment.Id))
                 throw new NotFoundException($"Could not remove appointment with id={appointment.Id} from order as no such appointmentId exists");
 
-            appointment.Taken = false;
-            appointment.OrderId = Guid.Empty;
+            appointment.OrderId = null;
             await _appointmentsService.UpdateAsync(appointment);
         }
     }
@@ -112,9 +109,23 @@ public class OrderService : IOrderService
             if (!await _appointmentsService.CheckIfAppointmentExists(appointment.Id))
                 throw new NotFoundException($"Could not add appointment with id={appointment.Id} to order with id={orderId} as no such appointmentId exists");
 
-            appointment.Taken = true;
             appointment.OrderId = orderId;
             await _appointmentsService.UpdateAsync(appointment);
         }
+    }
+
+    public async Task UpdateTotals()
+    {
+        // get totals and receipt
+    }
+
+    public async Task UpdatePaymentInfo(Guid companyId, Guid orderId, PaymentPostModel payment)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async  Task<string> GetReceipt(Guid companyId, Guid orderId)
+    {
+        throw new NotImplementedException();
     }
 }

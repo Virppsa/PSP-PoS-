@@ -34,7 +34,7 @@ namespace PspPos.Migrations
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("OrderId")
+                    b.Property<Guid?>("OrderId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("ServiceId")
@@ -45,9 +45,6 @@ namespace PspPos.Migrations
 
                     b.Property<Guid>("StoreId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("Taken")
-                        .HasColumnType("bit");
 
                     b.Property<Guid>("WorkerId")
                         .HasColumnType("uniqueidentifier");

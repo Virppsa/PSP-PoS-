@@ -19,6 +19,7 @@ public class AutoMapperProfiles : Profile
         CreateMap<ItemPostModel, Item>();
         CreateMap<Item, ItemViewModel>();
 
+        CreateMap<PaymentPostModel, Payment>();
     }
 }
 
