@@ -27,10 +27,10 @@ namespace PspPos.Controllers
             _context = context;
         }
 
-        [HttpGet("/cinematic/{companyId}/services")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [HttpGet("/cinematic/{companyId}/services")]
         public async Task<ActionResult<IEnumerable<Service>>> GetAllServices(Guid companyId)
         {
             IEnumerable<Service> services;
@@ -52,10 +52,10 @@ namespace PspPos.Controllers
             return Ok(services);
 
         }
-
-        [HttpPost("/cinematic/{companyId}/services")]
+        
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [HttpPost("/cinematic/{companyId}/services")]
         public async Task<ActionResult<Service>> CreateService(ServiceCreateRequest body, Guid companyId)
         {
             if (!await _context.CheckIfCompanyExists(companyId))
@@ -203,8 +203,8 @@ namespace PspPos.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [HttpPost("/cinematic/{companyId}/appointments/")]
-        public async Task<ActionResult<IEnumerable<GetAppointmentsRequest>>> GetAllAppointments([FromBody]GetAppointmentsRequest request, Guid companyId)
+        [HttpPost("/cinematic/{companyId}/appointments/get")]
+        public async Task<ActionResult<IEnumerable<GetAppointmentsRequest>>> GetAllAppointments([FromBody] GetAppointmentsRequest request, Guid companyId)
         {
             IEnumerable<Appointment> appointments;
 
@@ -241,20 +241,18 @@ namespace PspPos.Controllers
            try
             {
                 appointment = await _appointmentsService.GetValidatedAppointment(body, companyId, null);
-            } 
-            catch (NotFoundException _)
+                await _appointmentsService.InsertAsync(appointment);
+            }
+            catch (NotFoundException)
             {
                 return NotFound("The service does not exist");
             }
             catch(Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(ex.InnerException.ToString() ?? ex.Message);
             }
 
-            await _appointmentsService.InsertAsync(appointment);
-
             return Ok(appointment);
-
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -304,7 +302,7 @@ namespace PspPos.Controllers
             {
                 appointment = await _appointmentsService.GetValidatedAppointment(body, companyId, appointmentId);
             }
-            catch (NotFoundException _)
+            catch (NotFoundException)
             {
                 return NotFound("The service does not exist");
             }

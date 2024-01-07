@@ -6,6 +6,7 @@ using PspPos.Data;
 using PspPos.Infrastructure;
 using PspPos.Models;
 using PspPos.Models.DTO.Requests;
+using System;
 using System.Linq.Expressions;
 
 namespace PspPos.Services
@@ -26,7 +27,7 @@ namespace PspPos.Services
 
         public async Task<bool> AppointmentsRelationshipsAreValid(Guid companyId, Guid serviceId)
         {
-            return !await _context.CheckIfCompanyExists(companyId) || !await _serviceService.ExistsByPropertyAsync(x => x.Id == serviceId && x.companyId == companyId);
+            return await _context.CheckIfCompanyExists(companyId) && await _serviceService.ExistsByPropertyAsync(x => x.Id == serviceId && x.companyId == companyId);
         }
 
         public async Task<Appointment> GetValidatedAppointment(AppointmentCreateRequest appointment, Guid companyId, Guid? appointmentId)
@@ -49,9 +50,9 @@ namespace PspPos.Services
                 Id = appointmentId ?? Guid.NewGuid(),
                 StartDate = start,
                 EndDate = end,
-                OrderId = appointment.OrderId ?? Guid.Empty,
-                StoreId = appointment.StoreId ?? Guid.Empty,
-                WorkerId = appointment.WorkerId ?? Guid.Empty,
+                OrderId = appointment.OrderId,
+                StoreId = appointment.StoreId,
+                WorkerId = appointment.WorkerId,
             };
         }
 
@@ -127,7 +128,7 @@ namespace PspPos.Services
 
             if (DateTime.TryParse(lowerDateBoundary, out DateTime lowerBoundaryParsed) && DateTime.TryParse(higherDateBoundary, out DateTime higherBoundaryParsed))
             {
-                companiesAppointments = companiesAppointments.Where(x => x.StartDate <= lowerBoundaryParsed && x.EndDate >= higherBoundaryParsed);
+                companiesAppointments = companiesAppointments.Where(x => DateTime.Compare(lowerBoundaryParsed, x.StartDate) <= 0 && DateTime.Compare(higherBoundaryParsed, x.EndDate) >= 0);
             }
 
             return companiesAppointments.ToList();
