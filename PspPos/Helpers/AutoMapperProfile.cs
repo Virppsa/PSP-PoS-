@@ -33,6 +33,8 @@ public class AutoMapperProfiles : Profile
 
         CreateMap<OrderItemPostModel, OrderItem>();
         CreateMap<OrderItem, OrderItemViewModel>();
+        CreateMap<OrderItem, OrderItemPostModel> ();
+
     }
 }
 
