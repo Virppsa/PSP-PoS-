@@ -19,6 +19,11 @@ public class AutoMapperProfiles : Profile
         CreateMap<ItemPostModel, Item>();
         CreateMap<Item, ItemViewModel>();
 
+        CreateMap<ItemOptionPostModel, ItemOption>();
+        CreateMap<ItemOption, ItemOptionViewModel>();
+
+        CreateMap<InventoryPostModel, Inventory>();
+        CreateMap<Inventory, InventoryViewModel>();
     }
 }
 

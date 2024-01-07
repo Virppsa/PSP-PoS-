@@ -118,12 +118,7 @@ namespace PspPos.Services
             }
             else
             {
-                var itemToUpdate = await Get(companyId, itemId);
-                if (itemToUpdate == null)
-                {
-                    throw new NotFoundException($"Item with id={itemId} not found");
-                }
-
+                var itemToUpdate = await Get(companyId, itemId) ?? throw new NotFoundException($"Item with id={itemId} not found");
                 itemToUpdate.SerializedDiscount = JsonConvert.SerializeObject(discount);
 
                 await _context.SaveChangesAsync();
@@ -162,7 +157,27 @@ namespace PspPos.Services
 
         public async Task AddInventory(Inventory inventory)
         {
-            throw new NotImplementedException();
+            if (await _context.CheckIfCompanyExists(inventory.CompanyId) == false)
+            {
+                throw new NotFoundException($"Company with id={inventory.CompanyId} doesn't exist");
+            }
+            else
+            {
+                // TODO: when stores service merged, implement this
+                if (false)
+                {
+                    throw new NotFoundException($"Store with id={inventory.StoreId} doesn't exist");
+                }
+
+                var item = Get(inventory.CompanyId, inventory.ItemId);
+                if (item is null)
+                {
+                    throw new NotFoundException($"Item with id={inventory.ItemId} doesn't exist");
+                }
+                
+                await _context.Inventories.AddAsync(inventory);
+                await _context.SaveChangesAsync();
+            }
         }
 
         public async Task<Inventory?> GetInventory(Guid companyId, Guid inventoryId)
@@ -172,7 +187,17 @@ namespace PspPos.Services
 
         public async Task<List<Inventory>> GetAllInventories(Guid companyId)
         {
-            throw new NotImplementedException();
+            if (await _context.CheckIfCompanyExists(companyId) == false)
+            {
+                throw new NotFoundException($"Company with id={companyId} doesn't exist");
+            } 
+            else
+            {
+                var companyInventories = from inventory in await _context.Inventories.ToListAsync()
+                                   where inventory.CompanyId == companyId
+                                   select inventory;
+                return companyInventories.ToList();
+            }
         }
 
         public async Task<bool> DeleteInventory(Guid companyId, Guid inventoryId)

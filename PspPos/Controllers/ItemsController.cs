@@ -263,8 +263,8 @@ namespace PspPos.Controllers
             //important to imolement basic
             try
             {
-                throw new NotImplementedException();
-
+                var allInventories = await _itemsService.GetAllInventories(companyId);
+                return Ok(_mapper.Map<List<InventoryViewModel>>(allInventories));
             }
             catch (NotFoundException ex)
             {
@@ -281,8 +281,11 @@ namespace PspPos.Controllers
             //this is important
             try
             {
-                throw new NotImplementedException();
+                var createdInventory = _mapper.Map<Inventory>(inventory);
+                createdInventory.CompanyId = companyId;
+                await _itemsService.AddInventory(createdInventory);
 
+                return Ok(_mapper.Map<InventoryViewModel>(createdInventory));
             }
             catch (NotFoundException ex)
             {
