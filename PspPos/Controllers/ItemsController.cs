@@ -119,7 +119,7 @@ namespace PspPos.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> DeleteCompany(Guid companyId, Guid itemId)
+        public async Task<ActionResult> DeleteItem(Guid companyId, Guid itemId)
         {
             try 
             { 
@@ -163,6 +163,93 @@ namespace PspPos.Controllers
         }
 
         // Item option CRUD ---------------------------------------------------------------------------
+
+        [HttpGet("{companyId}/itemOptions")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<List<ItemOptionViewModel>>> GetAllItemOptions(Guid companyId)
+        {
+            try
+            {
+                throw new NotImplementedException();
+
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
+        [HttpPost("{companyId}/itemOptions")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<ItemOptionViewModel>> CreateItemOption(Guid companyId, ItemOptionPostModel itemOption)
+        {
+            try
+            {
+                throw new NotImplementedException();
+
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
+        [HttpGet("{companyId}/itemOptions/{itemOptionId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<ItemOptionViewModel>> GetItemOption(Guid companyId, Guid itemOptionId)
+        {
+            try
+            {
+                throw new NotImplementedException();
+
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
+        [HttpPut("{companyId}/itemOptions/{itemOptionId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<ItemOptionViewModel>> UpdateItemOption(Guid companyId, Guid itemOptionId, ItemOptionPostModel itemOption)
+        {
+            try
+            {
+                throw new NotImplementedException();
+
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
+        [HttpDelete("{companyId}/itemOptions/{itemOptionId}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult> DeleteItemOption(Guid companyId, Guid itemOptionId)
+        {
+            try
+            {
+                throw new NotImplementedException();
+
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
+        // Inventory CRUD ---------------------------------------------------------------------------
 
     }
 }
