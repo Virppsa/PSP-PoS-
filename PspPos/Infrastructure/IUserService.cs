@@ -1,4 +1,5 @@
 ﻿using PspPos.Models;
+using PspPos.Models.DTO.Requests;
 
 namespace PspPos.Infrastructure
 {
@@ -12,6 +13,8 @@ namespace PspPos.Infrastructure
         public Task<User> AddUser(UserPostModel user);
 
         public Task<User> UpdateUser(Guid userID, Guid companyID, UserPostModel updatedUser);
+
+        public Task<User> UpdateUserLoyalty(Guid userID, Guid companyID, UserLoyaltyUpdateRequest updatedUser);
 
         public Task DeleteUser(Guid userID, Guid companyID);
     }

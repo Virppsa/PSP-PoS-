@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using PspPos.Commons;
 using PspPos.Data;
+using PspPos.Infrastructure;
 using PspPos.Models;
 using PspPos.Models.DTO.Requests;
 using PspPos.Repositories;
@@ -14,11 +15,11 @@ namespace PspPos.Controllers
     public class ServiceController : ControllerBase
     {
         private readonly IServiceRepository _serviceRepository;
-        //private readonly IAppointmentRepository _appointmentsService;
-        private readonly AppointmentsService _appointmentsService;
+        //private readonly IAppointmentRepository _appointmentsRepository;
+        private readonly IAppointmentsService _appointmentsService;
         private readonly ApplicationContext _context;
 
-        public ServiceController(IServiceRepository serviceRepository, ApplicationContext context, AppointmentsService appointmentsService)
+        public ServiceController(IServiceRepository serviceRepository, ApplicationContext context, IAppointmentsService appointmentsService)
         {
             _serviceRepository = serviceRepository;
             _appointmentsService = appointmentsService;
@@ -31,7 +32,7 @@ namespace PspPos.Controllers
         {
             IEnumerable<Service> services;
 
-            if (await _context.CheckIfCompanyExists(companyId))
+            if (!await _context.CheckIfCompanyExists(companyId))
             {
                 return StatusCode(StatusCodes.Status404NotFound, "Provided Company does not exist");
             }
@@ -52,7 +53,7 @@ namespace PspPos.Controllers
         [HttpPost("/cinematic/{companyId}/services")]
         public async Task<ActionResult<Service>> CreateService(ServiceCreateRequest body, Guid companyId)
         {
-            if (await _context.CheckIfCompanyExists(companyId))
+            if (!await _context.CheckIfCompanyExists(companyId))
             {
                 return StatusCode(StatusCodes.Status404NotFound, "Provided Company does not exist");
             }
@@ -70,7 +71,7 @@ namespace PspPos.Controllers
         {
            Service? service;
 
-           if (await _context.CheckIfCompanyExists(companyId))
+           if (!await _context.CheckIfCompanyExists(companyId))
            {
                return StatusCode(StatusCodes.Status404NotFound, "Provided Company does not exist");
            }
@@ -96,7 +97,7 @@ namespace PspPos.Controllers
         [HttpPut("/cinematic/{companyId}/services/{serviceId}")]
         public async Task<ActionResult<Service>> EditService(ServiceCreateRequest body, Guid companyId, Guid serviceId)
         {
-            if (await _context.CheckIfCompanyExists(companyId))
+            if (!await _context.CheckIfCompanyExists(companyId))
             {
                 return StatusCode(StatusCodes.Status404NotFound, "Provided Company does not exist");
             }
@@ -120,7 +121,7 @@ namespace PspPos.Controllers
         [HttpDelete("/cinematic/{companyId}/services/{serviceId}")]
         public async Task<ActionResult> Delete(Guid companyId, Guid serviceId)
         {
-            if (await _context.CheckIfCompanyExists(companyId))
+            if (!await _context.CheckIfCompanyExists(companyId))
             {
                 return StatusCode(StatusCodes.Status404NotFound, "Provided Company does not exist");
             }
@@ -156,7 +157,7 @@ namespace PspPos.Controllers
         [HttpPut("/cinematic/{companyId}/services/{serviceId}/discount")]
         public async Task<ActionResult<ServiceDiscount>> AddDiscountToService(Guid companyId, Guid serviceId)
         {
-            if (await _context.CheckIfCompanyExists(companyId))
+            if (!await _context.CheckIfCompanyExists(companyId))
             {
                 return StatusCode(StatusCodes.Status404NotFound, "Provided Company does not exist");
             }
@@ -189,7 +190,7 @@ namespace PspPos.Controllers
         {
             IEnumerable<Appointment> appointments;
 
-            if (await _context.CheckIfCompanyExists(companyId))
+            if (!await _context.CheckIfCompanyExists(companyId))
             {
                 return StatusCode(StatusCodes.Status404NotFound, "Provided Company does not exist");
             }
@@ -210,7 +211,7 @@ namespace PspPos.Controllers
         [HttpPost("/cinematic/{companyId}/appointments")]
         public async Task<ActionResult<Appointment>> CreateAppointment([FromBody] AppointmentCreateRequest body, Guid companyId)
         {
-            if (await _context.CheckIfCompanyExists(companyId))
+            if (!await _context.CheckIfCompanyExists(companyId))
             {
                 return StatusCode(StatusCodes.Status404NotFound, "Provided Company does not exist");
             }
@@ -219,11 +220,11 @@ namespace PspPos.Controllers
             var appointment = new Appointment {
                 Id = Guid.NewGuid(),
                 CompanyId = companyId,
-                Taken = false,
                 StartDate = DateTime.Parse(body.StartDate),
                 EndDate = DateTime.Parse(body.EndDate),
                 WorkerId = body.WorkerId,
                 StoreId = body.StoreId,
+                OrderId = body.OrderId,
             };
            
 
@@ -238,7 +239,7 @@ namespace PspPos.Controllers
         {
             Appointment? appointment;
 
-            if (await _context.CheckIfCompanyExists(companyId))
+            if (!await _context.CheckIfCompanyExists(companyId))
             {
                 return StatusCode(StatusCodes.Status404NotFound, "Provided Company does not exist");
             }
@@ -263,7 +264,7 @@ namespace PspPos.Controllers
         [HttpPut("/cinematic/{companyId}/appointments/{appointmentId}")]
         public async Task<ActionResult<Appointment>> EditAppointment([FromBody] AppointmentCreateRequest body, Guid companyId, Guid appointmentId)
         {
-            if (await _context.CheckIfCompanyExists(companyId))
+            if (!await _context.CheckIfCompanyExists(companyId))
             {
                 return StatusCode(StatusCodes.Status404NotFound, "Provided Company does not exist");
             }
@@ -273,11 +274,11 @@ namespace PspPos.Controllers
             {
                 Id = appointmentId,
                 CompanyId = companyId,
-                Taken = body.Taken ?? false,
                 StartDate = DateTime.Parse(body.StartDate),
                 EndDate = DateTime.Parse(body.EndDate),
                 WorkerId = body.WorkerId,
                 StoreId = body.StoreId,
+                OrderId = body.OrderId,
             };
            
             try
@@ -296,7 +297,7 @@ namespace PspPos.Controllers
         [HttpDelete("/cinematic/{companyId}/appointments/{appointmentId}")]
         public async Task<ActionResult> DeleteAppointment(Guid companyId, Guid appointmentId)
         {
-            if (await _context.CheckIfCompanyExists(companyId))
+            if (!await _context.CheckIfCompanyExists(companyId))
             {
                 return StatusCode(StatusCodes.Status404NotFound, "Provided Company does not exist");
             }
