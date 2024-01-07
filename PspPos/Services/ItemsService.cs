@@ -24,7 +24,7 @@ namespace PspPos.Services
         {
             if (await _context.CheckIfCompanyExists(item.CompanyId) == false)
             {
-                throw new Exception($"Company with id={item.CompanyId} doesn't exist");
+                throw new NotFoundException($"Company with id={item.CompanyId} doesn't exist");
             } 
             else
             {
@@ -38,7 +38,7 @@ namespace PspPos.Services
         {
             if (await _context.CheckIfCompanyExists(companyId) == false)
             {
-                throw new Exception($"Company with id={companyId} doesn't exist");
+                throw new NotFoundException($"Company with id={companyId} doesn't exist");
             }
             else
             {
@@ -50,7 +50,7 @@ namespace PspPos.Services
         {
             if (await _context.CheckIfCompanyExists(companyId) == false)
             {
-                throw new Exception($"Company with id={companyId} doesn't exist");
+                throw new NotFoundException($"Company with id={companyId} doesn't exist");
             }
             else
             {
@@ -65,7 +65,7 @@ namespace PspPos.Services
         {
             if (await _context.CheckIfCompanyExists(companyId) == false)
             {
-                throw new Exception($"Company with id={companyId} doesn't exist");
+                throw new NotFoundException($"Company with id={companyId} doesn't exist");
             }
             else
             {
@@ -86,7 +86,7 @@ namespace PspPos.Services
         {
             if (await _context.CheckIfCompanyExists(item.CompanyId) == false)
             {
-                throw new Exception($"Company with id={item.CompanyId} doesn't exist");
+                throw new NotFoundException($"Company with id={item.CompanyId} doesn't exist");
             }
             else
             {

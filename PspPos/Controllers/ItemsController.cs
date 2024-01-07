@@ -2,6 +2,8 @@ using AutoMapper;
 using PspPos.Infrastructure;
 using PspPos.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using PspPos.Commons;
 
 namespace PspPos.Controllers
 {
@@ -20,60 +22,119 @@ namespace PspPos.Controllers
         }
 
         [HttpGet("{companyId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<List<ItemViewModel>>> GetAllItems(Guid companyId)
         {
-            var allCompanyItems = await _itemsService.GetAll(companyId);
-            return Ok(_mapper.Map<List<ItemViewModel>>(allCompanyItems));
+            try
+            {
+
+                var allCompanyItems = await _itemsService.GetAll(companyId);
+                return Ok(_mapper.Map<List<ItemViewModel>>(allCompanyItems));
+
+            } 
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
         [HttpPost("{companyId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<ItemViewModel>> CreateItem(Guid companyId, ItemPostModel item)
         {
-            var createdItem = _mapper.Map<Item>(item);
-            createdItem.CompanyId = companyId;
-            await _itemsService.Add(createdItem);
+            try 
+            { 
 
-            return Ok(_mapper.Map<ItemViewModel>(createdItem));
+                var createdItem = _mapper.Map<Item>(item);
+                createdItem.CompanyId = companyId;
+                await _itemsService.Add(createdItem);
+
+                return Ok(_mapper.Map<ItemViewModel>(createdItem));
+
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
         [HttpGet("{companyId}/items/{itemId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<ItemViewModel>> GetItem(Guid companyId, Guid itemId)
         {
-            var item = await _itemsService.Get(companyId, itemId);
-            if (item == null)
-            {
-                return NotFound();
+            try 
+            { 
+
+                var item = await _itemsService.Get(companyId, itemId);
+                if (item == null)
+                {
+                    return NotFound();
+                }
+                return Ok(_mapper.Map<ItemViewModel>(item));
+
             }
-            return Ok(_mapper.Map<ItemViewModel>(item));
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
         [HttpPut("{companyId}/items/{itemId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<ItemViewModel>> UpdateItem(Guid companyId, Guid itemId, ItemPostModel item)
         {
-            var itemUpdateWith = _mapper.Map<Item>(item);
-            itemUpdateWith.Id = itemId;
-            itemUpdateWith.CompanyId = companyId;
+            try { 
 
-            var updatedItem = await _itemsService.Update(itemUpdateWith);
+                var itemUpdateWith = _mapper.Map<Item>(item);
+                itemUpdateWith.Id = itemId;
+                itemUpdateWith.CompanyId = companyId;
 
-            if (updatedItem == null)
-            {
-                return NotFound();
+                var updatedItem = await _itemsService.Update(itemUpdateWith);
+
+                if (updatedItem == null)
+                {
+                    return NotFound();
+                }
+
+                return Ok(_mapper.Map<ItemViewModel>(updatedItem));
+
             }
-
-            return Ok(_mapper.Map<ItemViewModel>(updatedItem));
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
         [HttpDelete("{companyId}/items/{itemId}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> DeleteCompany(Guid companyId, Guid itemId)
         {
-            bool deleted = await _itemsService.Delete(companyId, itemId);
-            if (deleted == false)
-            {
-                return NotFound();
+            try 
+            { 
+
+                bool deleted = await _itemsService.Delete(companyId, itemId);
+                if (deleted == false)
+                {
+                    return NotFound();
+                }
+                else { 
+                    return NoContent();
+                }
+
             }
-            else { 
-                return NoContent();
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex.Message);
             }
         }
     }
