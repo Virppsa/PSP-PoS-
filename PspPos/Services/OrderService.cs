@@ -4,17 +4,20 @@ using PspPos.Models;
 using Microsoft.EntityFrameworkCore;
 using PspPos.Commons;
 using AutoMapper;
+using System.Linq.Expressions;
 
 namespace PspPos.Services;
 
 public class OrderService : IOrderService
 {
     private readonly ApplicationContext _context;
+    private readonly IAppointmentsService _appointmentsService;
     private readonly IMapper _mapper;
 
-    public OrderService(ApplicationContext context, IMapper mapper)
+    public OrderService(ApplicationContext context, IAppointmentsService appointmentsService, IMapper mapper)
     {
         _context = context;
+        _appointmentsService = appointmentsService;
         _mapper = mapper;
     }
 
@@ -72,12 +75,46 @@ public class OrderService : IOrderService
         orderToUpdate.CustomerId = order.CustomerId;
         orderToUpdate.PaymentMethodId = order.PaymentMethodId;
         orderToUpdate.Gratuity = order.Gratuity;
+
         orderToUpdate.Appointments = order.Appointments;
+        await AddNewAppointments(orderToUpdate.Id, orderToUpdate.Appointments, order.Appointments);
+        await RemoveDeletedAppointments(orderToUpdate.Appointments, order.Appointments);
+
         orderToUpdate.ItemOrders = order.ItemOrders;
         orderToUpdate.Status = order.Status;
 
         await _context.SaveChangesAsync();
 
         return orderToUpdate;
+    }
+
+    // TODO
+    // test these out!
+    private async Task RemoveDeletedAppointments(Guid[] oldAppointments, Guid[] newAppointments)
+    {
+        var deletedAppointments = await _appointmentsService.GetAllByPropertyAsync(app => oldAppointments.Contains(app.Id) && !newAppointments.Contains(app.Id));
+        foreach (var appointment in deletedAppointments)
+        {
+            if (!await _appointmentsService.CheckIfAppointmentExists(appointment.Id))
+                throw new NotFoundException($"Could not remove appointment with id={appointment.Id} from order as no such appointmentId exists");
+
+            appointment.Taken = false;
+            appointment.OrderId = Guid.Empty;
+            await _appointmentsService.UpdateAsync(appointment);
+        }
+    }
+
+    private async Task AddNewAppointments(Guid orderId, Guid[] oldAppointments, Guid[] newAppointments)
+    {
+        var createdAppointments = await _appointmentsService.GetAllByPropertyAsync(app => !oldAppointments.Contains(app.Id) && newAppointments.Contains(app.Id));
+        foreach (var appointment in createdAppointments)
+        {
+            if (!await _appointmentsService.CheckIfAppointmentExists(appointment.Id))
+                throw new NotFoundException($"Could not add appointment with id={appointment.Id} to order with id={orderId} as no such appointmentId exists");
+
+            appointment.Taken = true;
+            appointment.OrderId = orderId;
+            await _appointmentsService.UpdateAsync(appointment);
+        }
     }
 }

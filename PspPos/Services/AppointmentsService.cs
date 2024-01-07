@@ -11,9 +11,32 @@ namespace PspPos.Services
     {
         private readonly ApplicationContext _context;
 
+        // this is not in AppliationContext because at this point we've strayed too far from the light
+        private HashSet<Guid>? _availableAppointments = null;
+
         public AppointmentsService(ApplicationContext context)
         {
             _context = context;
+        }
+
+        public async Task<HashSet<Guid>> GetAvailableAppointments()
+        {
+            if (_availableAppointments is null)
+            {
+                var companies = await _context.Appointments.ToListAsync();
+                _availableAppointments = companies.Select(c => c.Id).ToHashSet()!;
+            }
+
+            return _availableAppointments;
+        }
+
+        public async Task<bool> CheckIfAppointmentExists(Guid id)
+        {
+            var appointments = await GetAvailableAppointments();
+            if (appointments.Contains(id))
+                return true;
+
+            return false;
         }
 
         public async Task<IEnumerable<Appointment>> GetAllAsync()
@@ -39,6 +62,7 @@ namespace PspPos.Services
         public async Task InsertAsync(Appointment model)
         {
             await _context.Appointments.AddAsync(model);
+            (await GetAvailableAppointments()).Add(model.Id);
             await _context.Instance.SaveChangesAsync();
         }
 
@@ -51,6 +75,7 @@ namespace PspPos.Services
         public async Task DeleteAsync(Appointment model)
         {
             _context.Appointments.Remove(model);
+            (await GetAvailableAppointments()).Remove(model.Id);
             await _context.Instance.SaveChangesAsync();
         }
 
