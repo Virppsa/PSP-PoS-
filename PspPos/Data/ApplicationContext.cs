@@ -18,9 +18,7 @@ public class ApplicationContext : DbContext
     public DbSet<Item> Items => Set<Item>();
     public DbSet<Service> Services => Set<Service>();
     public DbSet<Appointment> Appointments => Set<Appointment>();
-
     public DbSet<Payment> Payments => Set<Payment>();
-=======
     public DbSet<Store> Stores => Set<Store>();
     public DbSet<ItemOption> ItemOptions => Set<ItemOption>();
     public DbSet<Inventory> Inventories => Set<Inventory>();
