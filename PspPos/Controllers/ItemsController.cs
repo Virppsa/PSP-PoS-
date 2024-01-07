@@ -170,6 +170,7 @@ namespace PspPos.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<List<ItemOptionViewModel>>> GetAllItemOptions(Guid companyId)
         {
+            //this is important
             try
             {
                 throw new NotImplementedException();
@@ -187,6 +188,7 @@ namespace PspPos.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<ItemOptionViewModel>> CreateItemOption(Guid companyId, ItemOptionPostModel itemOption)
         {
+            //this is important
             try
             {
                 throw new NotImplementedException();
@@ -251,5 +253,92 @@ namespace PspPos.Controllers
 
         // Inventory CRUD ---------------------------------------------------------------------------
 
+        [HttpGet("{companyId}/inventory")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<List<InventoryViewModel>>> GetAllInventories(Guid companyId)
+        {
+            //LATER should accept query params to filter based on storeId and itemId
+            //important to imolement basic
+            try
+            {
+                throw new NotImplementedException();
+
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
+        [HttpPost("{companyId}/inventory")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<InventoryViewModel>> CreateInventory(Guid companyId, InventoryPostModel inventory)
+        {
+            //this is important
+            try
+            {
+                throw new NotImplementedException();
+
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
+        [HttpGet("{companyId}/inventory/{inventoryId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<InventoryViewModel>> GetInventory(Guid companyId, Guid inventoryId)
+        {
+            try
+            {
+                throw new NotImplementedException();
+
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
+        [HttpPut("{companyId}/inventory/{inventoryId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<InventoryViewModel>> UpdateInventory(Guid companyId, Guid inventoryId, InventoryPostModel inventory)
+        {
+            try
+            {
+                throw new NotImplementedException();
+
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
+        [HttpDelete("{companyId}/inventory/{inventoryId}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult> DeleteInventory(Guid companyId, Guid inventoryId)
+        {
+            try
+            {
+                throw new NotImplementedException();
+
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
     }
 }

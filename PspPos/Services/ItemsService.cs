@@ -21,6 +21,7 @@ namespace PspPos.Services
             _mapper = mapper;
         }
 
+        // Item CRUD --------------------------------------------------------------------------
         public async Task Add(Item item)
         {
             if (await _context.CheckIfCompanyExists(item.CompanyId) == false)
@@ -107,6 +108,8 @@ namespace PspPos.Services
             }
         }
 
+        // Add item discount --------------------------------------------------------------------------
+
         public async Task AddDiscount(Guid companyId, Guid itemId, ServiceDiscount discount)
         {
             if (await _context.CheckIfCompanyExists(companyId) == false)
@@ -125,6 +128,61 @@ namespace PspPos.Services
 
                 await _context.SaveChangesAsync();
             }
+        }
+
+
+        // ItemOption CRUD --------------------------------------------------------------------------
+        public async Task AddOption(ItemOption itemOption)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<ItemOption?> GetOption(Guid companyId, Guid itemOptionId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<List<ItemOption>> GetAllOptions(Guid companyId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<bool> DeleteOption(Guid companyId, Guid itemOptionId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<ItemOption?> UpdateOption(ItemOption itemOption)
+        {
+            throw new NotImplementedException();
+        }
+
+
+        // Inventory CRUD --------------------------------------------------------------------------
+
+        public async Task AddInventory(Inventory inventory)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<Inventory?> GetInventory(Guid companyId, Guid inventoryId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<List<Inventory>> GetAllInventories(Guid companyId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<bool> DeleteInventory(Guid companyId, Guid inventoryId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<Inventory?> UpdateInventory(Inventory iteminventory)
+        {
+            throw new NotImplementedException();
         }
     }
 }

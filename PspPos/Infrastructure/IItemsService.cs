@@ -12,5 +12,17 @@ namespace PspPos.Infrastructure
 
         public Task AddDiscount(Guid companyId, Guid itemId, ServiceDiscount discount);
 
+        public Task AddOption(ItemOption itemOption);
+        public Task<ItemOption?> GetOption(Guid companyId, Guid itemOptionId);
+        public Task<List<ItemOption>> GetAllOptions(Guid companyId);
+        public Task<bool> DeleteOption(Guid companyId, Guid itemOptionId);
+        public Task<ItemOption?> UpdateOption(ItemOption itemOption);
+
+        public Task AddInventory(Inventory inventory);
+        public Task<Inventory?> GetInventory(Guid companyId, Guid inventoryId);
+        public Task<List<Inventory>> GetAllInventories(Guid companyId);
+        public Task<bool> DeleteInventory(Guid companyId, Guid inventoryId);
+        public Task<Inventory?> UpdateInventory(Inventory iteminventory);
+
     }
 }

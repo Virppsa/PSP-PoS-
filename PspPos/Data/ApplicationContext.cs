@@ -18,6 +18,7 @@ public class ApplicationContext : DbContext
     public DbSet<Item> Items => Set<Item>();
     public DbSet<Service> Services => Set<Service>();
     public DbSet<ItemOption> ItemOptions => Set<ItemOption>();
+    public DbSet<Inventory> Inventories => Set<Inventory>();
 
 
     private HashSet<Guid>? _availableCompanies = null; 
