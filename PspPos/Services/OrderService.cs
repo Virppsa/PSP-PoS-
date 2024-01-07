@@ -4,7 +4,6 @@ using PspPos.Models;
 using Microsoft.EntityFrameworkCore;
 using PspPos.Commons;
 using AutoMapper;
-using System.Linq.Expressions;
 
 namespace PspPos.Services;
 
@@ -21,18 +20,17 @@ public class OrderService : IOrderService
         _mapper = mapper;
     }
 
-    public async Task<Order> Add(Guid companyId, OrderPostModel order)
+    public async Task<Order> Add(Guid companyId, Order order)
     {
         if(!await _context.CheckIfCompanyExists(companyId))
             throw new NotFoundException($"Company with id={companyId} not found");
 
-        var createdOrder = _mapper.Map<Order>(order);
-        createdOrder.CompanyId = companyId;
+        order.CompanyId = companyId;
 
-        await _context.Orders.AddAsync(createdOrder);
+        await _context.Orders.AddAsync(order);
         await _context.SaveChangesAsync();
 
-        return createdOrder;
+        return order;
     }
 
     public async Task<bool> Delete(Guid companyId, Guid id)
@@ -64,7 +62,7 @@ public class OrderService : IOrderService
         return orders.Where(o => o.CompanyId == companyId).ToList();
     }
 
-    public async Task<Order> Update(Guid companyId, Guid orderId, OrderPostModel order)
+    public async Task<Order> Update(Guid companyId, Guid orderId, Order order)
     {
         if (!await _context.CheckIfCompanyExists(companyId))
             throw new NotFoundException($"Company with id={companyId} not found");
@@ -73,12 +71,11 @@ public class OrderService : IOrderService
 
         orderToUpdate.WorkerId = order.WorkerId;
         orderToUpdate.CustomerId = order.CustomerId;
-        orderToUpdate.PaymentMethodId = order.PaymentMethodId;
         orderToUpdate.Gratuity = order.Gratuity;
 
-        orderToUpdate.Appointments = order.Appointments;
         await AddNewAppointments(orderToUpdate.Id, orderToUpdate.Appointments, order.Appointments);
         await RemoveDeletedAppointments(orderToUpdate.Appointments, order.Appointments);
+        orderToUpdate.Appointments = order.Appointments;
 
         orderToUpdate.ItemOrders = order.ItemOrders;
         orderToUpdate.Status = order.Status;
@@ -113,6 +110,114 @@ public class OrderService : IOrderService
 
             appointment.OrderId = orderId;
             await _appointmentsService.UpdateAsync(appointment);
+        }
+    }
+
+    public async Task UpdateTotals()
+    {
+        // get totals and receipt
+    }
+
+    public async Task UpdatePaymentInfo(Guid companyId, Guid orderId, PaymentPostModel payment)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async  Task<string> GetReceipt(Guid companyId, Guid orderId)
+    {
+        throw new NotImplementedException();
+    }
+
+    //NAGLIO Help with itemOrders---------------------------------------
+    //Add items to order (id item, store id)
+    //remove items from order (orderITEM ID)
+  
+    public async Task<OrderItem> AddItemOrder(Guid companyId, OrderItemPostModel order)
+    {
+        if (await _context.CheckIfCompanyExists(companyId) == false)
+        {
+            throw new NotFoundException($"Company with id={companyId} doesn't exist");
+        }
+        else
+        {
+            var itemOrder = _mapper.Map<OrderItem>(order);
+            itemOrder.CompanyId = companyId;
+            await _context.OrderItems.AddAsync(itemOrder);
+            await _context.SaveChangesAsync();
+            return itemOrder;
+        }
+    }
+
+    public async Task<bool> DeleteItemOrder(Guid companyId, Guid id)
+    {
+        if (await _context.CheckIfCompanyExists(companyId) == false)
+        {
+            throw new NotFoundException($"Company with id={companyId} doesn't exist");
+        }
+        else
+        {
+            var item = await _context.OrderItems.FindAsync(id);
+            if (item == null)
+            {
+                return false; // Not found
+            }
+
+            _context.OrderItems.Remove(item);
+
+            await _context.SaveChangesAsync();
+            return true; // Successful
+        }
+    }
+
+    public async Task<List<OrderItem>> GetAllItemOrders(Guid companyId, Guid storeId)
+    {
+        if (await _context.CheckIfCompanyExists(companyId) == false)
+        {
+            throw new NotFoundException($"Company with id={companyId} doesn't exist");
+        }
+        else
+        {
+            var itemOrders = from itemOrder in await _context.OrderItems.ToListAsync()
+                               where itemOrder.CompanyId == companyId && itemOrder.StoreId == storeId
+                               select itemOrder;
+            return itemOrders.ToList();
+        }
+    }
+
+    public async Task<OrderItem?> GetItemOrder(Guid companyId, Guid id)
+    {
+        if (await _context.CheckIfCompanyExists(companyId) == false)
+        {
+            throw new NotFoundException($"Company with id={companyId} doesn't exist");
+        }
+        else
+        {
+            return await _context.OrderItems.FindAsync(id);
+        }
+    }
+
+    public async Task<OrderItem> UpdateItemOrder(Guid companyId, Guid id, OrderItemPostModel order)
+    {
+        if (await _context.CheckIfCompanyExists(companyId) == false)
+        {
+            throw new NotFoundException($"Company with id={companyId} doesn't exist");
+        }
+        else
+        {
+            var itemToUpdate = await GetItemOrder(companyId, id);
+            if (itemToUpdate == null)
+            {
+                return null;
+            }
+
+            itemToUpdate.ItemId = order.ItemId;
+            itemToUpdate.StoreId = order.StoreId;
+            itemToUpdate.ItemOptions = order.ItemOptions;
+            itemToUpdate.Status = order.Status;
+            itemToUpdate.WorkerId = order.WorkerId;
+
+            await _context.SaveChangesAsync();
+            return itemToUpdate;
         }
     }
 }

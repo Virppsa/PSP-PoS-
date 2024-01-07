@@ -5,6 +5,7 @@ using PspPos.Models;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.Design;
 using PspPos.Models.DTO.Requests;
+using PspPos.Commons;
 
 namespace PspPos.Services
 {
@@ -30,9 +31,9 @@ namespace PspPos.Services
         {
             var user = await _context.Users.FindAsync(userID);
 
-            if (user is null || isUserValid(user, companyID))
+            if (!isUserValid(user, companyID))
             {
-                throw new KeyNotFoundException($"User with ID {userID} or CompanyID {companyID} not found.");
+                throw new NotFoundException($"User with ID {userID} or CompanyID {companyID} not found.");
             }
 
             return user;
@@ -58,7 +59,7 @@ namespace PspPos.Services
             var existingUser = await _context.Users.FindAsync(userID);
             if (!isUserValid(existingUser, companyID))
             {
-                throw new KeyNotFoundException($"User with ID {userID} or CompanyID {companyID} not found.");
+                throw new NotFoundException($"User with ID {userID} or CompanyID {companyID} not found.");
             }
 
             existingUser!.Email = updatedUser.Email;
@@ -77,7 +78,7 @@ namespace PspPos.Services
             var existingUser = await _context.Users.FindAsync(userID);
             if (!isUserValid(existingUser, companyID))
             {
-                throw new KeyNotFoundException($"User with ID {userID} or CompanyID {companyID} not found.");
+                throw new NotFoundException($"User with ID {userID} or CompanyID {companyID} not found.");
             }
 
             existingUser!.LoyaltyPoints = updatedUser.LoyaltyPoints;
@@ -92,7 +93,7 @@ namespace PspPos.Services
             var existingUser = await _context.Users.FindAsync(userID);
             if (!isUserValid(existingUser, companyID))
             {
-                throw new KeyNotFoundException($"User with ID {userID} or CompanyID {companyID} not found.");
+                throw new NotFoundException($"User with ID {userID} or CompanyID {companyID} not found.");
             }
 
             _context.Users.Remove(existingUser);

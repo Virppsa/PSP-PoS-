@@ -64,7 +64,8 @@ public class OrderController : ControllerBase
     {
         try
         {
-            return Ok(await _orderService.Add(companyId, order));
+            var mappedOrder = _mapper.Map<Order>(order);
+            return Ok(await _orderService.Add(companyId, mappedOrder));
         }
         catch(NotFoundException ex)
         {
@@ -96,7 +97,8 @@ public class OrderController : ControllerBase
     {
         try
         {
-            return Ok(await _orderService.Update(companyId, orderId, order));
+            var mappedOrder = _mapper.Map<Order>(order);
+            return Ok(await _orderService.Update(companyId, orderId, mappedOrder));
         }
         catch (NotFoundException ex) 
         {
@@ -116,6 +118,92 @@ public class OrderController : ControllerBase
             return NoContent();
         }
         catch(NotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+    }
+
+    //NAGLIO Help with itemOrders---------------------------------------
+
+    // this is not in the contract
+    [HttpPost("{companyId}/itemOrders")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<OrderItemViewModel>> CreateOrderItem([Required] Guid companyId, [Required] OrderItemPostModel order)
+    {
+        try
+        {
+            return Ok(_mapper.Map<OrderItemViewModel>(await _orderService.AddItemOrder(companyId, order)));
+        }
+        catch (NotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+    }
+
+    //this is not in the contract
+    [HttpDelete("{companyId}/itemOrders/{itemOrderId}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult> DeleteOrderItem([Required] Guid companyId, [Required] Guid id)
+    {
+        try
+        {
+            await _orderService.DeleteItemOrder(companyId, id);
+            return NoContent();
+        }
+        catch (NotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+    }
+
+    [HttpGet("{companyId}/itemOrders")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<OrderItemViewModel>> GetAllItemOrders([Required] Guid companyId, [Required] Guid storeId)
+    {
+        try
+        {
+            return Ok(_mapper.Map<List<OrderItemViewModel>>(await _orderService.GetAllItemOrders(companyId, storeId)));
+        }
+        catch (NotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+    }
+
+    [HttpGet("{companyId}/itemOrders/{itemOrderId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<OrderItemViewModel>> GetItemOrder([Required] Guid companyId, [Required] Guid id)
+    {
+        try
+        {
+            return Ok(_mapper.Map<OrderItemViewModel>(await _orderService.GetItemOrder(companyId, id)));
+        }
+        catch (NotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+    }
+
+    // /status and /assign PUT endpoints merged into one
+    [HttpPut("{companyId}/itemOrders/{itemOrderId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<OrderItemViewModel>> UpdateItemOrder([Required] Guid companyId, [Required] Guid id, [Required] OrderItemPostModel order)
+    {
+        try
+        {
+            return Ok(_mapper.Map<OrderItemViewModel>(await _orderService.UpdateItemOrder(companyId, id, order)));
+        }
+        catch (NotFoundException ex)
         {
             return NotFound(ex.Message);
         }
