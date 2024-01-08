@@ -8,6 +8,7 @@ using PspPos.Models;
 using PspPos.Models.DTO.Requests;
 using System;
 using System.Linq.Expressions;
+using static PspPos.Models.DTO.Requests.AppointmentCreateRequest;
 
 namespace PspPos.Services
 {
@@ -33,6 +34,31 @@ namespace PspPos.Services
         public async Task<Appointment> GetValidatedAppointment(AppointmentCreateRequest appointment, Guid companyId, Guid? appointmentId)
         {
             if(!await AppointmentsRelationshipsAreValid(companyId, appointment.ServiceId))
+            {
+                throw new NotFoundException("Relationships invalid");
+            }
+
+            if (!DateTime.TryParse(appointment.StartDate, out DateTime start) || !DateTime.TryParse(appointment.EndDate, out DateTime end))
+            {
+                throw new Exception("Failed to parse dates");
+            }
+
+
+            return new Appointment
+            {
+                ServiceId = appointment.ServiceId,
+                CompanyId = companyId,
+                Id = appointmentId ?? Guid.NewGuid(),
+                StartDate = start,
+                EndDate = end,
+                StoreId = appointment.StoreId,
+                WorkerId = appointment.WorkerId
+            };
+        }
+
+        public async Task<Appointment> GetValidatedUpdatedAppointment(AppointmentUpdateRequest appointment, Guid companyId, Guid? appointmentId)
+        {
+            if (!await AppointmentsRelationshipsAreValid(companyId, appointment.ServiceId))
             {
                 throw new NotFoundException("Relationships invalid");
             }

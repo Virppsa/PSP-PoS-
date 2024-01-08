@@ -8,7 +8,6 @@ namespace PspPos.Models.DTO.Requests
         public required string StartDate { get; set; }
         public required string EndDate { get; set; }
         public Guid? StoreId { get; set; }
-        public Guid? OrderId { get; set; }
     }
 
     public class AppointmentUpdateRequest
@@ -19,5 +18,6 @@ namespace PspPos.Models.DTO.Requests
         public required string EndDate { get; set; }
         public Guid? StoreId { get; set; }
         public Guid? OrderId { get; set; }
+
     }
 }

@@ -289,7 +289,7 @@ namespace PspPos.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPut("/cinematic/{companyId}/appointments/{appointmentId}")]
-        public async Task<ActionResult<Appointment>> EditAppointment([FromBody] AppointmentCreateRequest body, Guid companyId, Guid appointmentId)
+        public async Task<ActionResult<Appointment>> EditAppointment([FromBody] AppointmentUpdateRequest body, Guid companyId, Guid appointmentId)
         {
             if (!await _context.CheckIfCompanyExists(companyId))
             {
@@ -300,7 +300,7 @@ namespace PspPos.Controllers
 
             try
             {
-                appointment = await _appointmentsService.GetValidatedAppointment(body, companyId, appointmentId);
+                appointment = await _appointmentsService.GetValidatedUpdatedAppointment(body, companyId, appointmentId);
             }
             catch (NotFoundException)
             {

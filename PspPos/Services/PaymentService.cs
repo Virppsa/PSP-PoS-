@@ -49,7 +49,7 @@ public class PaymentService: IPaymentService
         CustomerId = paymentRequest.CustomerId,
         PaymentMethod = paymentRequest.PaymentMethod,
         PaymentStatus = "Completed",
-        AmountPaid = paymentRequest.AmountPaid + paymentRequest.Gratuity - calculatedLoyaltyDiscount,
+        AmountPaid = paymentRequest.AmountPaid - calculatedLoyaltyDiscount,
         Gratuity = paymentRequest.Gratuity
         };
 
