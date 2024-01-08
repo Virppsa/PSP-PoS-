@@ -12,12 +12,14 @@ public class OrderService : IOrderService
     private readonly ApplicationContext _context;
     private readonly IAppointmentsService _appointmentsService;
     private readonly IMapper _mapper;
+    private readonly IItemsService _itemsService;
 
-    public OrderService(ApplicationContext context, IAppointmentsService appointmentsService, IMapper mapper)
+    public OrderService(ApplicationContext context, IAppointmentsService appointmentsService, IMapper mapper, IItemsService itemsService)
     {
         _context = context;
         _appointmentsService = appointmentsService;
         _mapper = mapper;
+        _itemsService = itemsService;
     }
 
     public async Task<Order> Add(Guid companyId, Order order)
@@ -79,8 +81,15 @@ public class OrderService : IOrderService
 
         orderToUpdate.ItemOrders = order.ItemOrders;
         orderToUpdate.Status = order.Status;
-
         await _context.SaveChangesAsync();
+
+        //Also update OrderItems' orderIds
+        foreach (var itemOrderId in orderToUpdate.ItemOrders)
+        {
+            var itemOrder = await GetItemOrder(companyId, itemOrderId) ?? throw new NotFoundException($"ItemOrder {itemOrderId} doesn't exist");
+            itemOrder.OrderId = orderId;
+            await UpdateItemOrder(companyId, itemOrderId, _mapper.Map<OrderItemPostModel>(itemOrder));
+        }
 
         return orderToUpdate;
     }
@@ -127,11 +136,7 @@ public class OrderService : IOrderService
     {
         throw new NotImplementedException();
     }
-
-    //NAGLIO Help with itemOrders---------------------------------------
-    //Add items to order (id item, store id)
-    //remove items from order (orderITEM ID)
-  
+ 
     public async Task<OrderItem> AddItemOrder(Guid companyId, OrderItemPostModel order)
     {
         if (await _context.CheckIfCompanyExists(companyId) == false)
@@ -144,6 +149,17 @@ public class OrderService : IOrderService
             itemOrder.CompanyId = companyId;
             await _context.OrderItems.AddAsync(itemOrder);
             await _context.SaveChangesAsync();
+
+            //Also, decrease inventory Amount
+            foreach (var inventory in await _itemsService.GetAllInventories(companyId))
+            {
+                if (inventory.ItemId == order.ItemId)
+                {
+                    inventory.Amount -= 1;
+                    await _itemsService.UpdateInventory(inventory);
+                }
+            }
+
             return itemOrder;
         }
     }
