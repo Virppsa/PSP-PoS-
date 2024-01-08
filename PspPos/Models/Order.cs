@@ -4,7 +4,7 @@ public class Order
 {
     public Guid CompanyId { get; set; }
     public Guid Id { set; get; }
-    public Guid WorkerId { set; get; }
+    public Guid? WorkerId { set; get; }
     public Guid CustomerId { set; get; }
     public double Tax { set; get; }
     public double TotalAmount { set; get; }

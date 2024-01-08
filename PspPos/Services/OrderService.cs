@@ -200,15 +200,13 @@ public class OrderService : IOrderService
             {
                 discount = JsonSerializer.Deserialize<ServiceDiscount>(item.SerializedDiscount);
             }
-            double discountAmount = discount?.DiscountPercentage ?? 0;
+            double appliedDiscountRate = discount?.DiscountPercentage ?? 0;
 
-            // TODO
-            // why the fuck is price nullable??
-            // item.Tax should be percentage based not flat amount
-            double priceAfterDiscount = item.Price! - (item.Price! * discountAmount!) ?? 0;
-            double taxAmount = item.Tax ?? 0;
-            double priceAfterTax = priceAfterDiscount - taxAmount;
-            partialReceipt += $"+ {item.Name}: {item.Price} ({discountAmount}% DISCOUNT) ({item.Tax}% TAX) = {priceAfterTax}\n";
+            double priceToDiscount = item.Price * appliedDiscountRate;
+            double priceAfterDiscount = item.Price - priceToDiscount;
+            double taxAmount = priceAfterDiscount * item.Tax;
+            double priceAfterTax = priceAfterDiscount + taxAmount;
+            partialReceipt += $"+ {item.Name}: {item.Price} ({appliedDiscountRate}% DISCOUNT) ({item.Tax}% TAX) = {priceAfterTax}\n";
 
             totalPrice += priceAfterTax;
             totalTax += taxAmount;

@@ -52,7 +52,7 @@ namespace PspPos.Services
                 EndDate = end,
                 OrderId = appointment.OrderId,
                 StoreId = appointment.StoreId,
-                WorkerId = appointment.WorkerId,
+                WorkerId = appointment.WorkerId
             };
         }
 

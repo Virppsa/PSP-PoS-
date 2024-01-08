@@ -10,8 +10,8 @@ namespace PspPos.Models
         public Guid CompanyId { set; get; }
         public string? Name { set; get; }
         public string? Description { set; get; }
-        public double? Price { set; get; }
-        public double? Tax { set; get; }
+        public double Price { set; get; }
+        public double Tax { set; get; }
         public string? SerializedDiscount { get; set; }
     }
 }

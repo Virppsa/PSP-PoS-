@@ -12,8 +12,8 @@ using PspPos.Data;
 namespace PspPos.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20240108130355_Init")]
-    partial class Init
+    [Migration("20240108161604_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -115,13 +115,13 @@ namespace PspPos.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<double?>("Price")
+                    b.Property<double>("Price")
                         .HasColumnType("float");
 
                     b.Property<string>("SerializedDiscount")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<double?>("Tax")
+                    b.Property<double>("Tax")
                         .HasColumnType("float");
 
                     b.HasKey("Id");
@@ -195,7 +195,7 @@ namespace PspPos.Migrations
                     b.Property<double>("TotalAmount")
                         .HasColumnType("float");
 
-                    b.Property<Guid>("WorkerId")
+                    b.Property<Guid?>("WorkerId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
@@ -227,7 +227,7 @@ namespace PspPos.Migrations
                     b.Property<Guid>("StoreId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("WorkerId")
+                    b.Property<Guid?>("WorkerId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");

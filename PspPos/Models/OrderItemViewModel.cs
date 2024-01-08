@@ -13,6 +13,6 @@ namespace PspPos.Models
         public List<Guid>? ItemOptions { set; get; }
 
         public string? Status { set; get; }
-        public Guid WorkerId { set; get; }
+        public Guid? WorkerId { set; get; }
     }
 }
