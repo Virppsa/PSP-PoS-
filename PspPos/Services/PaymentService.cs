@@ -27,16 +27,18 @@ public class PaymentService: IPaymentService
 
         User user = await _userService.GetUserByCompanyAndUserID(companyId, paymentRequest.CustomerId);
 
-        if (paymentRequest.LoyaltyPointsToUse is not null && user.LoyaltyPoints < paymentRequest.LoyaltyPointsToUse)
+        if (user.LoyaltyPoints < paymentRequest.LoyaltyPointsToUse)
             throw new BadHttpRequestException($"Insufficient loyalty points for user");
 
-        if (paymentRequest.LoyaltyPointsToUse is not null)
+        double calculatedLoyaltyDiscount = 0;
+        if (paymentRequest.LoyaltyPointsToUse is not 0)
         {
-          user.LoyaltyPoints -= paymentRequest.LoyaltyPointsToUse ?? 0; 
-          await _userService.UpdateUser(user.GUID, companyId, new UserPostModel { LoyaltyPoints = user.LoyaltyPoints});
+            paymentRequest.LoyaltyPointsToUse = (int)Math.Min(paymentRequest.LoyaltyPointsToUse, order.TotalAmount * 100);
+
+            user.LoyaltyPoints -= paymentRequest.LoyaltyPointsToUse; 
+            await _userService.UpdateUser(user.GUID, companyId, new UserPostModel { LoyaltyPoints = user.LoyaltyPoints});
+            calculatedLoyaltyDiscount = paymentRequest.LoyaltyPointsToUse / 100;
         }
-       
-        var calculatedLoyaltyDiscount = paymentRequest.LoyaltyPointsToUse is not null ? paymentRequest.LoyaltyPointsToUse / 100 : 0;
 
         Payment payment = new Payment 
         { 
@@ -46,7 +48,9 @@ public class PaymentService: IPaymentService
         CustomerId = paymentRequest.CustomerId,
         PaymentMethod = paymentRequest.PaymentMethod,
         PaymentStatus = "Completed",
-        TotalAmount = paymentRequest.TotalAmount - calculatedLoyaltyDiscount,
+        // TODO 
+        // cap here
+        AmountPaid = paymentRequest.AmountPaid - calculatedLoyaltyDiscount,
         };
 
         order.PaymentId = payment.Id;

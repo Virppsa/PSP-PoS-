@@ -9,9 +9,6 @@ public interface IOrderService
     public Task<List<Order>> GetAll(Guid companyId);
     public Task<bool> Delete(Guid companyId, Guid id);
     public Task<Order> Update(Guid companyId, Guid orderId, Order order);
-    public Task UpdatePaymentInfo(Guid companyId, Guid orderId, PaymentPostModel payment);
-    public Task<string> GetReceipt(Guid companyId, Guid orderId);
-   
     public Task<OrderItem> AddItemOrder(Guid companyId, OrderItemPostModel order);
     public Task<bool> DeleteItemOrder(Guid companyId, Guid id);
     public Task<List<OrderItem>> GetAllItemOrders(Guid companyId, Guid storeId);

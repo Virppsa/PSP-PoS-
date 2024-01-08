@@ -104,6 +104,10 @@ public class OrderController : ControllerBase
         {
             return NotFound(ex.Message);
         }
+        catch (BadHttpRequestException ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
     [HttpDelete("{orderId}")]

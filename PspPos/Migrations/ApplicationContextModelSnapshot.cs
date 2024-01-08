@@ -242,6 +242,7 @@ namespace PspPos.Migrations
 
                     b.Property<float?>("LoyaltyDiscount")
                         .HasColumnType("real");
+
                     b.Property<Guid>("OrderId")
                         .HasColumnType("uniqueidentifier");
 

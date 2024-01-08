@@ -4,6 +4,8 @@ using PspPos.Models;
 using Microsoft.EntityFrameworkCore;
 using PspPos.Commons;
 using AutoMapper;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 namespace PspPos.Services;
 
@@ -11,13 +13,15 @@ public class OrderService : IOrderService
 {
     private readonly ApplicationContext _context;
     private readonly IAppointmentsService _appointmentsService;
+    private readonly IServiceService _serviceService;
     private readonly IMapper _mapper;
     private readonly IItemsService _itemsService;
 
-    public OrderService(ApplicationContext context, IAppointmentsService appointmentsService, IMapper mapper, IItemsService itemsService)
+    public OrderService(ApplicationContext context, IAppointmentsService appointmentsService, IServiceService serviceService, IMapper mapper, IItemsService itemsService)
     {
         _context = context;
         _appointmentsService = appointmentsService;
+        _serviceService = serviceService;
         _mapper = mapper;
         _itemsService = itemsService;
     }
@@ -64,23 +68,38 @@ public class OrderService : IOrderService
         return orders.Where(o => o.CompanyId == companyId).ToList();
     }
 
+    // TODO
+    // test out if you can update finalized order
     public async Task<Order> Update(Guid companyId, Guid orderId, Order order)
     {
         if (!await _context.CheckIfCompanyExists(companyId))
             throw new NotFoundException($"Company with id={companyId} not found");
 
         var orderToUpdate = await Get(companyId, orderId);
+        if (orderToUpdate.Status is "Completed" or "Refunded")
+            throw new BadHttpRequestException("Cannot update order which has been finalized");
 
         orderToUpdate.WorkerId = order.WorkerId;
         orderToUpdate.CustomerId = order.CustomerId;
-        orderToUpdate.Gratuity = order.Gratuity;
+
+        // TODO
+        // UPDATE RECEIPT HERE!!
+        // receipt flow:
+        // on update receipt is completely redone, on payment, order level discounts are added and order can no longer be updated
+
+        double newTotalAmount = 0;
+        string newReceipt = $"--- RECEIPT FOR CUSTOMER {orderToUpdate.CustomerId}: ---";
 
         await AddNewAppointments(orderToUpdate.Id, orderToUpdate.Appointments, order.Appointments);
         await RemoveDeletedAppointments(orderToUpdate.Appointments, order.Appointments);
         orderToUpdate.Appointments = order.Appointments;
+        var aggregatedAppointmentInfo = await GetTotalsAppointments(order.Appointments);
 
         orderToUpdate.ItemOrders = order.ItemOrders;
         orderToUpdate.Status = order.Status;
+
+        orderToUpdate.TotalAmount = newTotalAmount;
+        orderToUpdate.Receipt = newReceipt;
         await _context.SaveChangesAsync();
 
         //Also update OrderItems' orderIds
@@ -92,6 +111,36 @@ public class OrderService : IOrderService
         }
 
         return orderToUpdate;
+    }
+
+    private async Task<(double TotalPrice, double TotalTax, string PartialReceipt)> GetTotalsAppointments(Guid[] appointmentIds)
+    {
+        double totalPrice = 0;
+        double totalTax = 0;
+        string partialReceipt = "--- APPOINTMENTS: ---";
+
+        var allAppointments = (await _appointmentsService.GetAllByPropertyAsync(app => appointmentIds.Contains(app.Id))).ToArray();
+        var allServices = await _serviceService.GetAllByPropertyAsync(service => allAppointments.Any(app => app.ServiceId == service.Id)); 
+
+        foreach(var app in allAppointments)
+        {
+            var service = allServices.First(service => service.Id == app.ServiceId);
+            ServiceDiscount? discount = null;
+            if(service.SerializedDiscount is not null)
+            {
+                discount = JsonSerializer.Deserialize<ServiceDiscount>(service.SerializedDiscount);
+            }
+            double discountAmount = discount?.DiscountPercentage ?? 0;
+
+            double priceAfterDiscount = service.Price - (service.Price * discountAmount);
+            double priceAfterTax = priceAfterDiscount + (priceAfterDiscount * service.Tax);
+            partialReceipt += $"+ {service.Name}: {service.Price} ({discountAmount}% DISCOUNT) ({service.Tax}% TAX) = {priceAfterTax}";
+
+            totalPrice += priceAfterTax;
+            totalTax += service.Tax;
+        }
+
+        return (totalPrice, totalTax, partialReceipt);
     }
 
     // TODO
@@ -120,21 +169,6 @@ public class OrderService : IOrderService
             appointment.OrderId = orderId;
             await _appointmentsService.UpdateAsync(appointment);
         }
-    }
-
-    public async Task UpdateTotals()
-    {
-        // get totals and receipt
-    }
-
-    public async Task UpdatePaymentInfo(Guid companyId, Guid orderId, PaymentPostModel payment)
-    {
-        throw new NotImplementedException();
-    }
-
-    public async  Task<string> GetReceipt(Guid companyId, Guid orderId)
-    {
-        throw new NotImplementedException();
     }
  
     public async Task<OrderItem> AddItemOrder(Guid companyId, OrderItemPostModel order)

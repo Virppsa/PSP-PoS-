@@ -7,6 +7,7 @@ public class Payment
     public Guid CustomerId { get; set; }
     public string PaymentMethod { get; set; }
     public string PaymentStatus { get; set; }
-    public float? LoyaltyDiscount { get; set; }
-    public float? TotalAmount { get; set; }
+    public double LoyaltyDiscount { get; set; } = 0;
+    public double AmountPaid { get; set; }
+    public double Gratuity { get; set; }
 }
