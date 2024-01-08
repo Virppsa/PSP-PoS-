@@ -63,7 +63,7 @@ namespace PspPos.Controllers
                 return StatusCode(StatusCodes.Status404NotFound, "Provided Company does not exist");
             }
 
-            var service = new Service { Id = Guid.NewGuid(), companyId = companyId, Description = body.Description, Price = body.Price, Name = body.Name };
+            var service = new Service { Id = Guid.NewGuid(), companyId = companyId, Description = body.Description, Price = body.Price, Name = body.Name, Tax = TaxSystem.TaxMultiplier };
             // calculate tax and add also
             await _serviceService.InsertAsync(service);
 
@@ -171,7 +171,7 @@ namespace PspPos.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPut("/cinematic/{companyId}/services/{serviceId}/discount")]
-        public async Task<ActionResult<ServiceDiscount>> AddDiscountToService(Guid companyId, Guid serviceId)
+        public async Task<ActionResult<Service>> AddDiscountToService(Guid companyId, Guid serviceId)
         {
             if (!await _context.CheckIfCompanyExists(companyId))
             {
@@ -190,14 +190,14 @@ namespace PspPos.Controllers
 
             try
             {
-               await _serviceService.UpdateAsync(service);
+               await _serviceService.UpdateAsync(serviceWithDiscount);
             }
             catch
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Failed to Apply Discount to a Service");
             }
 
-            return Ok(discount);
+            return Ok(serviceWithDiscount);
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]

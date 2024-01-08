@@ -30,7 +30,7 @@ namespace PspPos.Services
             } 
             else
             {
-                item.Tax = item.Price * TaxSystem.TaxMultiplier;
+                item.Tax = TaxSystem.TaxMultiplier;
                 await _context.Items.AddAsync(item);
                 await _context.SaveChangesAsync();
             }
@@ -101,7 +101,6 @@ namespace PspPos.Services
                 itemToUpdate.Name = item.Name;
                 itemToUpdate.Description = item.Description;
                 itemToUpdate.Price = item.Price;
-                itemToUpdate.Tax = item.Price * TaxSystem.TaxMultiplier;
 
                 await _context.SaveChangesAsync();
                 return itemToUpdate;

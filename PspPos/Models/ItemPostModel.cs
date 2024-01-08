@@ -7,6 +7,5 @@ namespace PspPos.Models
         public string? Name { set; get; }
         public string? Description { set; get; }
         public double? Price { set; get; }
-
     }
 }

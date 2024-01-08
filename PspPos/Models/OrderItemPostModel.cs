@@ -10,6 +10,6 @@ namespace PspPos.Models
         public Guid StoreId { set; get; }
         public List<Guid>? ItemOptions { set; get; }
         public string? Status { set; get; }
-        public Guid WorkerId { set; get; }
+        public Guid? WorkerId { set; get; }
     }
 }
