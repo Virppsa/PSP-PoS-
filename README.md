@@ -9,7 +9,10 @@ GET /cinematic/{companyId}/inventory does not have implemented filters.
 ## Changes made to ORDER endpoints
 
 1. PUT /cinematic/{companyId}/itemOrders/{itemOrderId}/status and PUT /cinematic/{companyId}/itemOrders/{itemOrderId}/assign are merged into one PUT /cinematic/{companyId}/itemOrders/{itemOrderId} endpoint
-2. Additiongal POST /cinematic/{companyId}/itemOrders/{itemOrderId} and DELETE /cinematic/{companyId}/itemOrders/{itemOrderId} endpoints were added.
+2. Additional POST /cinematic/{companyId}/itemOrders/{itemOrderId} and DELETE /cinematic/{companyId}/itemOrders/{itemOrderId} endpoints were added.
+3. Void feature for payments has been removed since Refund has exact same functionalilty.
+4. Several update endpoints (assign worker, edit state) have been merged into one Update endpoint for Orders.
+5. Loyalty system has been changed to offer flat discount based on amount of points accrued by customer. 
 
 ## Added - 2023-12-11
 
