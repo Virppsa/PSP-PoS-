@@ -9,7 +9,7 @@ namespace PspPos.Models
         public Guid Id { set; get; }
         public Guid ItemId { set; get; }
         public Guid StoreId { set; get; }
-        public Guid OrderId { set; get; }
+        public Guid? OrderId { set; get; }
         public List<Guid>? ItemOptions { set; get; }
 
         public string? Status { set; get; }

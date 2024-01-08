@@ -112,6 +112,32 @@ public class OrderService : IOrderService
         newTotalTax += aggregatedAppointmentInfo.TotalTax;
         newReceipt += aggregatedAppointmentInfo.PartialReceipt;
 
+        // same principle as with appointments, assign new itemorders orderids
+        var newItemOrders = order.ItemOrders.Where(id => !orderToUpdate.ItemOrders.Contains(id));
+        foreach (var itemOrderId in newItemOrders)
+        {
+            var itemOrder = await GetItemOrder(companyId, itemOrderId) ?? throw new NotFoundException($"ItemOrder {itemOrderId} doesn't exist");
+            if (itemOrder.OrderId is not null)
+                throw new BadHttpRequestException($"ItemOrder with id={itemOrder.Id} already has order assigned!");
+
+            itemOrder.OrderId = orderId;
+            await UpdateItemOrder(companyId, itemOrderId, _mapper.Map<OrderItemPostModel>(itemOrder));
+        }
+
+        // same principle as with appointments, remove itemorders orderids
+        var deletedItemOrders = orderToUpdate.ItemOrders.Where(id => !order.ItemOrders.Contains(id));
+        foreach (var itemOrderId in deletedItemOrders)
+        {
+            var itemOrder = await GetItemOrder(companyId, itemOrderId) ?? throw new NotFoundException($"ItemOrder {itemOrderId} doesn't exist");
+            itemOrder.OrderId = null;
+            await UpdateItemOrder(companyId, itemOrderId, _mapper.Map<OrderItemPostModel>(itemOrder));
+        }
+
+        var aggregatedItemOrderInfo = await GetTotalsItemOrders(companyId, orderId);
+        newTotalAmount += aggregatedItemOrderInfo.TotalPrice;
+        newTotalTax += aggregatedItemOrderInfo.TotalTax;
+        newReceipt += aggregatedItemOrderInfo.PartialReceipt;
+
         orderToUpdate.ItemOrders = order.ItemOrders;
         orderToUpdate.Status = order.Status;
 
@@ -119,14 +145,6 @@ public class OrderService : IOrderService
         orderToUpdate.Tax = newTotalTax;
         orderToUpdate.Receipt = newReceipt;
         await _context.SaveChangesAsync();
-
-        //Also update OrderItems' orderIds
-        foreach (var itemOrderId in orderToUpdate.ItemOrders)
-        {
-            var itemOrder = await GetItemOrder(companyId, itemOrderId) ?? throw new NotFoundException($"ItemOrder {itemOrderId} doesn't exist");
-            itemOrder.OrderId = orderId;
-            await UpdateItemOrder(companyId, itemOrderId, _mapper.Map<OrderItemPostModel>(itemOrder));
-        }
 
         return orderToUpdate;
     }
@@ -153,8 +171,44 @@ public class OrderService : IOrderService
 
             double priceAfterDiscount = service.Price - (service.Price * discountAmount);
             double taxAmount = priceAfterDiscount * service.Tax;
-            double priceAfterTax = priceAfterDiscount + taxAmount;
+            double priceAfterTax = priceAfterDiscount - taxAmount;
             partialReceipt += $"+ {service.Name}: {service.Price} ({discountAmount}% DISCOUNT) ({service.Tax}% TAX) = {priceAfterTax}\n";
+
+            totalPrice += priceAfterTax;
+            totalTax += taxAmount;
+        }
+
+        partialReceipt += "\n";
+
+        return (totalPrice, totalTax, partialReceipt);
+    }
+
+    private async Task<(double TotalPrice, double TotalTax, string PartialReceipt)> GetTotalsItemOrders(Guid companyId, Guid orderId)
+    {
+        double totalPrice = 0;
+        double totalTax = 0;
+        string partialReceipt = "--- ITEM ORDERS: ---\n";
+
+        var allItemOrders = _context.OrderItems.Where(item => item.OrderId == orderId).ToArray();
+        var allItems = await _itemsService.GetAll(companyId);
+
+        foreach (var order in allItemOrders)
+        {
+            var item = allItems.First(i => i.Id == order.ItemId);
+            ServiceDiscount? discount = null;
+            if (item.SerializedDiscount is not null)
+            {
+                discount = JsonSerializer.Deserialize<ServiceDiscount>(item.SerializedDiscount);
+            }
+            double discountAmount = discount?.DiscountPercentage ?? 0;
+
+            // TODO
+            // why the fuck is price nullable??
+            // item.Tax should be percentage based not flat amount
+            double priceAfterDiscount = item.Price! - (item.Price! * discountAmount!) ?? 0;
+            double taxAmount = item.Tax ?? 0;
+            double priceAfterTax = priceAfterDiscount - taxAmount;
+            partialReceipt += $"+ {item.Name}: {item.Price} ({discountAmount}% DISCOUNT) ({item.Tax}% TAX) = {priceAfterTax}\n";
 
             totalPrice += priceAfterTax;
             totalTax += taxAmount;
@@ -198,7 +252,7 @@ public class OrderService : IOrderService
             await _appointmentsService.UpdateAsync(appointment);
         }
     }
- 
+
     public async Task<OrderItem> AddItemOrder(Guid companyId, OrderItemPostModel order)
     {
         if (await _context.CheckIfCompanyExists(companyId) == false)
@@ -285,7 +339,7 @@ public class OrderService : IOrderService
             var itemToUpdate = await GetItemOrder(companyId, id);
             if (itemToUpdate == null)
             {
-                return null;
+                throw new NotFoundException($"ItemOrder with id={id} doesn't exist");
             }
 
             itemToUpdate.ItemId = order.ItemId;
