@@ -88,17 +88,22 @@ public class OrderService : IOrderService
         // on update receipt is completely redone, on payment, order level discounts are added and order can no longer be updated
 
         double newTotalAmount = 0;
-        string newReceipt = $"--- RECEIPT FOR CUSTOMER {orderToUpdate.CustomerId}: ---";
+        double newTotalTax = 0;
+        string newReceipt = $"--- RECEIPT FOR CUSTOMER {orderToUpdate.CustomerId}: ---\n";
 
         await AddNewAppointments(orderToUpdate.Id, orderToUpdate.Appointments, order.Appointments);
         await RemoveDeletedAppointments(orderToUpdate.Appointments, order.Appointments);
         orderToUpdate.Appointments = order.Appointments;
         var aggregatedAppointmentInfo = await GetTotalsAppointments(order.Appointments);
+        newTotalAmount += aggregatedAppointmentInfo.TotalPrice;
+        newTotalTax += aggregatedAppointmentInfo.TotalTax;
+        newReceipt += aggregatedAppointmentInfo.PartialReceipt;
 
         orderToUpdate.ItemOrders = order.ItemOrders;
         orderToUpdate.Status = order.Status;
 
         orderToUpdate.TotalAmount = newTotalAmount;
+        orderToUpdate.Tax = newTotalTax;
         orderToUpdate.Receipt = newReceipt;
         await _context.SaveChangesAsync();
 
@@ -117,7 +122,7 @@ public class OrderService : IOrderService
     {
         double totalPrice = 0;
         double totalTax = 0;
-        string partialReceipt = "--- APPOINTMENTS: ---";
+        string partialReceipt = "--- APPOINTMENTS: ---\n";
 
         var allAppointments = (await _appointmentsService.GetAllByPropertyAsync(app => appointmentIds.Contains(app.Id))).ToArray();
         var allServices = await _serviceService.GetAllByPropertyAsync(service => allAppointments.Any(app => app.ServiceId == service.Id)); 
@@ -133,12 +138,15 @@ public class OrderService : IOrderService
             double discountAmount = discount?.DiscountPercentage ?? 0;
 
             double priceAfterDiscount = service.Price - (service.Price * discountAmount);
-            double priceAfterTax = priceAfterDiscount + (priceAfterDiscount * service.Tax);
-            partialReceipt += $"+ {service.Name}: {service.Price} ({discountAmount}% DISCOUNT) ({service.Tax}% TAX) = {priceAfterTax}";
+            double taxAmount = priceAfterDiscount * service.Tax;
+            double priceAfterTax = priceAfterDiscount + taxAmount;
+            partialReceipt += $"+ {service.Name}: {service.Price} ({discountAmount}% DISCOUNT) ({service.Tax}% TAX) = {priceAfterTax}\n";
 
             totalPrice += priceAfterTax;
-            totalTax += service.Tax;
+            totalTax += taxAmount;
         }
+
+        partialReceipt += "\n";
 
         return (totalPrice, totalTax, partialReceipt);
     }
