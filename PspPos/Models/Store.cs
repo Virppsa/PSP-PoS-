@@ -7,7 +7,6 @@ namespace PspPos.Models
     public class Store
     {
         [Key]
-
         public Guid Guid { get; set; }
         [ForeignKey("Company")]
         public Guid CompanyId { get; set; }

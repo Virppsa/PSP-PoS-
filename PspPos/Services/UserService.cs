@@ -39,7 +39,7 @@ namespace PspPos.Services
             return user;
         }
 
-        public async Task<User> AddUser(UserPostModel user)
+        public async Task<User> AddUser(UserPostModel user, Guid companyId)
         {
             if (user is null)
             {
@@ -47,6 +47,7 @@ namespace PspPos.Services
             }
 
             var createUser = _mapper.Map<User>(user);
+            createUser.CompanyId = companyId;
 
             await _context.Users.AddAsync(createUser);
             await _context.SaveChangesAsync();
