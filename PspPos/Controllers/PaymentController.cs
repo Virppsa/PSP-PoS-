@@ -30,12 +30,12 @@ public class PaymentController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<Payment>> ReceivePayment([Required] Guid companyId, [Required] Guid orderId, [Required] PaymentPostModel paymentModel)
+    public async Task<ActionResult<Payment>> ReceivePayment([Required] Guid companyId, [Required] PaymentPostModel paymentModel)
     {
         try
         {
             var payment = _mapper.Map<Payment>(paymentModel);
-            return Ok(await _paymentService.CreateAsync(companyId, orderId, payment));
+            return Ok(await _paymentService.CreateAsync(companyId, paymentModel));
         }
         catch (NotFoundException ex)
         {
@@ -57,6 +57,7 @@ public class PaymentController : ControllerBase
         {
             // TODO:
             // idk if we should check if payment is valid, what if the cashier is super chill and cool
+            // implement api endpoint for super chill and cool cashiers which accepts anything
             return Ok(await _paymentService.GetAsync(companyId, paymentId));
         }
         catch (NotFoundException ex)

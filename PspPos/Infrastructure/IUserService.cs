@@ -10,7 +10,7 @@ namespace PspPos.Infrastructure
 
         public Task<User> GetUserByCompanyAndUserID(Guid companyID, Guid userID);
 
-        public Task<User> AddUser(UserPostModel user);
+        public Task<User> AddUser(UserPostModel user, Guid companyId);
 
         public Task<User> UpdateUser(Guid userID, Guid companyID, UserPostModel updatedUser);
 
