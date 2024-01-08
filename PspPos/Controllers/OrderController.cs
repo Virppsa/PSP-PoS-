@@ -60,7 +60,7 @@ public class OrderController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<Order>> CreateOrder([Required] Guid companyId, [Required] OrderPostModel order)
+    public async Task<ActionResult<Order>> CreateOrder([Required] Guid companyId, [Required] OrderCreateModel order)
     {
         try
         {
@@ -103,6 +103,10 @@ public class OrderController : ControllerBase
         catch (NotFoundException ex) 
         {
             return NotFound(ex.Message);
+        }
+        catch (BadHttpRequestException ex)
+        {
+            return BadRequest(ex.Message);
         }
     }
 

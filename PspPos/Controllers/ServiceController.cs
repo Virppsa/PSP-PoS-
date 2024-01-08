@@ -249,7 +249,7 @@ namespace PspPos.Controllers
             }
             catch(Exception ex)
             {
-                return BadRequest(ex.InnerException.ToString() ?? ex.Message);
+                return BadRequest(ex.InnerException?.ToString() ?? ex.Message);
             }
 
             return Ok(appointment);

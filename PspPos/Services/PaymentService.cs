@@ -27,16 +27,19 @@ public class PaymentService: IPaymentService
 
         User user = await _userService.GetUserByCompanyAndUserID(companyId, paymentRequest.CustomerId);
 
-        if (paymentRequest.LoyaltyPointsToUse is not null && user.LoyaltyPoints < paymentRequest.LoyaltyPointsToUse)
+        if (user.LoyaltyPoints < paymentRequest.LoyaltyPointsToUse)
             throw new BadHttpRequestException($"Insufficient loyalty points for user");
 
-        if (paymentRequest.LoyaltyPointsToUse is not null)
+        // discount may be greater than order total, thus it needs to be capped
+        double calculatedLoyaltyDiscount = 0;
+        if (paymentRequest.LoyaltyPointsToUse is not 0)
         {
-          user.LoyaltyPoints -= paymentRequest.LoyaltyPointsToUse ?? 0; 
-          await _userService.UpdateUser(user.GUID, companyId, new UserPostModel { LoyaltyPoints = user.LoyaltyPoints});
+            paymentRequest.LoyaltyPointsToUse = (int)Math.Min(paymentRequest.LoyaltyPointsToUse, order.TotalAmount * 100);
+
+            user.LoyaltyPoints -= paymentRequest.LoyaltyPointsToUse; 
+            await _userService.UpdateUser(user.GUID, companyId, new UserPostModel { LoyaltyPoints = user.LoyaltyPoints});
+            calculatedLoyaltyDiscount = paymentRequest.LoyaltyPointsToUse / 100;
         }
-       
-        var calculatedLoyaltyDiscount = paymentRequest.LoyaltyPointsToUse is not null ? paymentRequest.LoyaltyPointsToUse / 100 : 0;
 
         Payment payment = new Payment 
         { 
@@ -46,13 +49,22 @@ public class PaymentService: IPaymentService
         CustomerId = paymentRequest.CustomerId,
         PaymentMethod = paymentRequest.PaymentMethod,
         PaymentStatus = "Completed",
-        TotalAmount = paymentRequest.TotalAmount - calculatedLoyaltyDiscount,
+        AmountPaid = paymentRequest.AmountPaid + paymentRequest.Gratuity - calculatedLoyaltyDiscount,
+        Gratuity = paymentRequest.Gratuity
         };
 
         order.PaymentId = payment.Id;
         order.Status = "Completed";
 
-        await _orderService.Update(companyId, order.Id, order);
+        double totalPaid = payment.AmountPaid - calculatedLoyaltyDiscount;
+        string receiptTotals = "--- TOTALS: ---\n";
+        receiptTotals += $"+ Total cost: {order.TotalAmount}\n";
+        receiptTotals += $"+ Total tax: {order.Tax}\n";
+        receiptTotals += $"+ Total paid: {payment.AmountPaid} + {payment.Gratuity} (gratuity) - {calculatedLoyaltyDiscount} (discount) = {totalPaid}\n";
+        receiptTotals += $"+ Loyalty points used: {paymentRequest.LoyaltyPointsToUse} = -{calculatedLoyaltyDiscount}\n";
+        receiptTotals += $"+ Total deduced from customer: {payment.AmountPaid}\n";
+        receiptTotals += $"(Payment method used: {paymentRequest.PaymentMethod})";
+        order.Receipt += receiptTotals;
 
         await _context.Payments.AddAsync(payment);
 

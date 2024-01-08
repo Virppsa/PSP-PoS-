@@ -13,6 +13,7 @@ public class AutoMapperProfiles : Profile
         CreateMap<CompanyPostModel, Company>();
 
         CreateMap<OrderPostModel, Order>();
+        CreateMap<OrderCreateModel, Order>();
 
         CreateMap<UserPostModel, User>();
 

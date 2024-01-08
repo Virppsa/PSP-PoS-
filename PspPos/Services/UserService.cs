@@ -20,6 +20,11 @@ namespace PspPos.Services
             _mapper = mapper;
         }
 
+        public async Task<bool> CheckIfUserExists(Guid companyId, Guid userId)
+        {
+            return await _context.Users.AnyAsync(user => user.CompanyId == companyId && user.GUID == userId);
+        }
+
         public async Task<List<User>> GetUsersByCompanyIdAsync(Guid companyId)
         {
             return await _context.Users

@@ -12,8 +12,8 @@ using PspPos.Data;
 namespace PspPos.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20240107193208_again_init")]
-    partial class again_init
+    [Migration("20240108095500_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -171,9 +171,6 @@ namespace PspPos.Migrations
                     b.Property<Guid>("CustomerId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<double>("Gratuity")
-                        .HasColumnType("float");
-
                     b.Property<string>("ItemOrders")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -183,6 +180,10 @@ namespace PspPos.Migrations
 
                     b.Property<Guid?>("PaymentId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Receipt")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -239,6 +240,18 @@ namespace PspPos.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<double>("AmountPaid")
+                        .HasColumnType("float");
+
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<double>("Gratuity")
+                        .HasColumnType("float");
+
+                    b.Property<double>("LoyaltyDiscount")
+                        .HasColumnType("float");
 
                     b.Property<Guid>("OrderId")
                         .HasColumnType("uniqueidentifier");
@@ -356,28 +369,15 @@ namespace PspPos.Migrations
                     b.Property<string>("Role")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("StoreId")
-                        .HasColumnType("int");
+                    b.Property<Guid?>("StoreId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("GUID");
 
-                    b.HasIndex("CompanyId");
-
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("PspPos.Models.Store", b =>
-                {
-                    b.HasOne("PspPos.Models.Company", "Company")
-                        .WithMany()
-                        .HasForeignKey("CompanyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Company");
-                });
-
-            modelBuilder.Entity("PspPos.Models.User", b =>
                 {
                     b.HasOne("PspPos.Models.Company", "Company")
                         .WithMany()
