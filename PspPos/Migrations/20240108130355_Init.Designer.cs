@@ -12,7 +12,7 @@ using PspPos.Data;
 namespace PspPos.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20240108095500_Init")]
+    [Migration("20240108130355_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -218,7 +218,7 @@ namespace PspPos.Migrations
                     b.Property<string>("ItemOptions")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("OrderId")
+                    b.Property<Guid?>("OrderId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Status")

@@ -99,7 +99,7 @@ namespace PspPos.Migrations
                     CompanyId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ItemId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     StoreId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    OrderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    OrderId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     ItemOptions = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     WorkerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)

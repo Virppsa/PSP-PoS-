@@ -215,7 +215,7 @@ namespace PspPos.Migrations
                     b.Property<string>("ItemOptions")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("OrderId")
+                    b.Property<Guid?>("OrderId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Status")
