@@ -4,7 +4,6 @@ using PspPos.Models;
 using Microsoft.EntityFrameworkCore;
 using PspPos.Commons;
 using AutoMapper;
-using System.Text.Json.Serialization;
 using System.Text.Json;
 
 namespace PspPos.Services;
@@ -14,14 +13,24 @@ public class OrderService : IOrderService
     private readonly ApplicationContext _context;
     private readonly IAppointmentsService _appointmentsService;
     private readonly IServiceService _serviceService;
+    private readonly IUserService _userService;
     private readonly IMapper _mapper;
     private readonly IItemsService _itemsService;
 
-    public OrderService(ApplicationContext context, IAppointmentsService appointmentsService, IServiceService serviceService, IMapper mapper, IItemsService itemsService)
+    public OrderService
+    (
+    ApplicationContext context,
+    IAppointmentsService appointmentsService,
+    IServiceService serviceService,
+    IUserService userService, 
+    IMapper mapper,
+    IItemsService itemsService
+    )
     {
         _context = context;
         _appointmentsService = appointmentsService;
         _serviceService = serviceService;
+        _userService = userService;
         _mapper = mapper;
         _itemsService = itemsService;
     }
@@ -30,6 +39,9 @@ public class OrderService : IOrderService
     {
         if(!await _context.CheckIfCompanyExists(companyId))
             throw new NotFoundException($"Company with id={companyId} not found");
+
+        if (!await _userService.CheckIfUserExists(companyId, order.CustomerId))
+            throw new NotFoundException($"Customer with id={order.CustomerId} not found");
 
         order.CompanyId = companyId;
 
@@ -77,19 +89,20 @@ public class OrderService : IOrderService
 
         var orderToUpdate = await Get(companyId, orderId);
         if (orderToUpdate.Status is "Completed" or "Refunded")
-            throw new BadHttpRequestException($"Cannot update order which has been finalized {orderToUpdate.Status}");
+            throw new BadHttpRequestException("Cannot update order which has been finalized");
+
+        if(!await _userService.CheckIfUserExists(companyId, order.CustomerId))
+            throw new NotFoundException($"Customer with id={order.CustomerId} not found");
 
         orderToUpdate.WorkerId = order.WorkerId;
         orderToUpdate.CustomerId = order.CustomerId;
 
         // TODO
-        // UPDATE RECEIPT HERE!!
-        // receipt flow:
-        // on update receipt is completely redone, on payment, order level discounts are added and order can no longer be updated
+        // UPDATE TOTALAMOUNT, TAX AND RECEIPT FOR ITEMRODERS HERE JUST LIKE WITH APPOINTMENTS
 
         double newTotalAmount = 0;
         double newTotalTax = 0;
-        string newReceipt = $"--- RECEIPT FOR CUSTOMER {orderToUpdate.CustomerId}: ---\n";
+        string newReceipt = $"--- RECEIPT FOR CUSTOMER {orderToUpdate.CustomerId}: ---\n\n";
 
         await AddNewAppointments(orderToUpdate.Id, orderToUpdate.Appointments, order.Appointments);
         await RemoveDeletedAppointments(orderToUpdate.Appointments, order.Appointments);
@@ -169,11 +182,17 @@ public class OrderService : IOrderService
 
     private async Task AddNewAppointments(Guid orderId, Guid[] oldAppointments, Guid[] newAppointments)
     {
+        if(newAppointments.Distinct().Count() != newAppointments.Count())
+            throw new BadHttpRequestException("Cannot add multiple of the same appointment!");
+
         var createdAppointments = await _appointmentsService.GetAllByPropertyAsync(app => !oldAppointments.Contains(app.Id) && newAppointments.Contains(app.Id));
         foreach (var appointment in createdAppointments)
         {
             if (!await _appointmentsService.CheckIfAppointmentExists(appointment.Id))
                 throw new NotFoundException($"Could not add appointment with id={appointment.Id} to order with id={orderId} as no such appointmentId exists");
+
+            if(appointment.OrderId is not null)
+                throw new BadHttpRequestException($"Appointment with id={appointment.Id} is already assigned to an order!");
 
             appointment.OrderId = orderId;
             await _appointmentsService.UpdateAsync(appointment);

@@ -5,7 +5,7 @@ namespace PspPos.Infrastructure
 {
     public interface IUserService
     {
-
+        public Task<bool> CheckIfUserExists(Guid companyId, Guid userId);
         public Task<List<User>> GetUsersByCompanyIdAsync(Guid companyId);
 
         public Task<User> GetUserByCompanyAndUserID(Guid companyID, Guid userID);

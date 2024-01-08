@@ -22,27 +22,22 @@ public class PaymentController : ControllerBase
         _mapper = mapper;
     }
 
-    // TODO
-    //[HttpPut("{companyId}/receipt")]
-    //[ProducesResponseType(StatusCodes.Status200OK)]
-    //[ProducesResponseType(StatusCodes.Status404NotFound)]
-    //[ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    //public async Task<ActionResult<Payment>> GetReceipt([Required] Guid companyId, [Required] PaymentPostModel paymentModel)
-    //{
-    //    try
-    //    {
-    //        var payment = _mapper.Map<Payment>(paymentModel);
-    //        return Ok(await _paymentService.CreateAsync(companyId, paymentModel));
-    //    }
-    //    catch (NotFoundException ex)
-    //    {
-    //        return NotFound(ex.Message);
-    //    }
-    //    catch (BadHttpRequestException ex)
-    //    {
-    //        return BadRequest(ex.Message);
-    //    }
-    //}
+    [HttpGet("{companyId}/receipt")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<string>> GetReceipt([Required] Guid companyId, [Required] Guid orderId)
+    {
+        try
+        {
+            var order = await _orderService.Get(companyId, orderId);
+            return Ok(order.Receipt);
+        }
+        catch (NotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+    }
 
     [HttpPut("{companyId}/receive")]
     [ProducesResponseType(StatusCodes.Status200OK)]

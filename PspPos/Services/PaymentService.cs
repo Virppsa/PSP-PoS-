@@ -58,6 +58,8 @@ public class PaymentService: IPaymentService
 
         double totalPaid = payment.AmountPaid - calculatedLoyaltyDiscount;
         string receiptTotals = "--- TOTALS: ---\n";
+        receiptTotals += $"+ Total cost: {order.TotalAmount}\n";
+        receiptTotals += $"+ Total tax: {order.Tax}\n";
         receiptTotals += $"+ Total paid: {payment.AmountPaid} + {payment.Gratuity} (gratuity) - {calculatedLoyaltyDiscount} (discount) = {totalPaid}\n";
         receiptTotals += $"+ Loyalty points used: {paymentRequest.LoyaltyPointsToUse} = -{calculatedLoyaltyDiscount}\n";
         receiptTotals += $"+ Total deduced from customer: {payment.AmountPaid}\n";
