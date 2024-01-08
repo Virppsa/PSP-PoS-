@@ -22,9 +22,27 @@ public class PaymentController : ControllerBase
         _mapper = mapper;
     }
 
-    // Get payment - create payment, set to finished, throw error if not valid
-    // Refund payment - reset order and payment status
-    // Get receipt, probably from order
+    // TODO
+    //[HttpPut("{companyId}/receipt")]
+    //[ProducesResponseType(StatusCodes.Status200OK)]
+    //[ProducesResponseType(StatusCodes.Status404NotFound)]
+    //[ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    //public async Task<ActionResult<Payment>> GetReceipt([Required] Guid companyId, [Required] PaymentPostModel paymentModel)
+    //{
+    //    try
+    //    {
+    //        var payment = _mapper.Map<Payment>(paymentModel);
+    //        return Ok(await _paymentService.CreateAsync(companyId, paymentModel));
+    //    }
+    //    catch (NotFoundException ex)
+    //    {
+    //        return NotFound(ex.Message);
+    //    }
+    //    catch (BadHttpRequestException ex)
+    //    {
+    //        return BadRequest(ex.Message);
+    //    }
+    //}
 
     [HttpPut("{companyId}/receive")]
     [ProducesResponseType(StatusCodes.Status200OK)]

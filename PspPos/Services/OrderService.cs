@@ -77,7 +77,7 @@ public class OrderService : IOrderService
 
         var orderToUpdate = await Get(companyId, orderId);
         if (orderToUpdate.Status is "Completed" or "Refunded")
-            throw new BadHttpRequestException("Cannot update order which has been finalized");
+            throw new BadHttpRequestException($"Cannot update order which has been finalized {orderToUpdate.Status}");
 
         orderToUpdate.WorkerId = order.WorkerId;
         orderToUpdate.CustomerId = order.CustomerId;
