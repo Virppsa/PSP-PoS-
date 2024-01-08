@@ -172,7 +172,9 @@ public class OrderService : IOrderService
             double priceAfterDiscount = service.Price - (service.Price * discountAmount);
             double taxAmount = priceAfterDiscount * service.Tax;
             double priceAfterTax = priceAfterDiscount - taxAmount;
-            partialReceipt += $"+ {service.Name}: {Math.Round(service.Price)} ({discountAmount}% DISCOUNT) ({Math.Round(service.Tax) * 100}% TAX) = {Math.Round(priceAfterTax)}\n";
+            partialReceipt += $"+ {service.Name}: {Math.Round(service.Price, 2)} " +
+                $"- {Math.Round(service.Price * discountAmount, 2)} ({discountAmount * 100}% DISCOUNT)" +
+                $" + {Math.Round(taxAmount, 2)} ({Math.Round(service.Tax * 100, 2)}% TAX) = {Math.Round(priceAfterTax, 2)}\n";
 
             totalPrice += priceAfterTax;
             totalTax += taxAmount;
@@ -206,7 +208,9 @@ public class OrderService : IOrderService
             double priceAfterDiscount = item.Price - priceToDiscount;
             double taxAmount = priceAfterDiscount * item.Tax;
             double priceAfterTax = priceAfterDiscount + taxAmount;
-            partialReceipt += $"+ {item.Name}: {item.Price} ({appliedDiscountRate}% DISCOUNT) ({Math.Round(item.Tax) * 100}% TAX) = {priceAfterTax}\n";
+            partialReceipt += $"+ {item.Name}: {item.Price} " +
+                $"- {Math.Round(priceToDiscount, 2)} ({appliedDiscountRate}% DISCOUNT) " +
+                $"+ {Math.Round(taxAmount, 2)} ({Math.Round(item.Tax, 2) * 100}% TAX) = {priceAfterTax}\n";
 
             totalPrice += priceAfterTax;
             totalTax += taxAmount;
