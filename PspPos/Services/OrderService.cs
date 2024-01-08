@@ -172,7 +172,7 @@ public class OrderService : IOrderService
             double priceAfterDiscount = service.Price - (service.Price * discountAmount);
             double taxAmount = priceAfterDiscount * service.Tax;
             double priceAfterTax = priceAfterDiscount - taxAmount;
-            partialReceipt += $"+ {service.Name}: {service.Price} ({discountAmount}% DISCOUNT) ({Math.Round(service.Tax) * 100}% TAX) = {priceAfterTax}\n";
+            partialReceipt += $"+ {service.Name}: {Math.Round(service.Price)} ({discountAmount}% DISCOUNT) ({Math.Round(service.Tax) * 100}% TAX) = {Math.Round(priceAfterTax)}\n";
 
             totalPrice += priceAfterTax;
             totalTax += taxAmount;
