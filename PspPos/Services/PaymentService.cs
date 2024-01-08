@@ -49,7 +49,7 @@ public class PaymentService: IPaymentService
         CustomerId = paymentRequest.CustomerId,
         PaymentMethod = paymentRequest.PaymentMethod,
         PaymentStatus = "Completed",
-        AmountPaid = paymentRequest.AmountPaid + paymentRequest.Gratuity - calculatedLoyaltyDiscount,
+        AmountPaid = paymentRequest.AmountPaid - calculatedLoyaltyDiscount,
         Gratuity = paymentRequest.Gratuity
         };
 
@@ -58,11 +58,11 @@ public class PaymentService: IPaymentService
 
         double totalPaid = payment.AmountPaid - calculatedLoyaltyDiscount;
         string receiptTotals = "--- TOTALS: ---\n";
-        receiptTotals += $"+ Total cost: {order.TotalAmount}\n";
-        receiptTotals += $"+ Total tax: {order.Tax}\n";
-        receiptTotals += $"+ Total paid: {payment.AmountPaid} + {payment.Gratuity} (gratuity) - {calculatedLoyaltyDiscount} (discount) = {totalPaid}\n";
+        receiptTotals += $"+ Total cost: {Math.Round(order.TotalAmount)}\n";
+        receiptTotals += $"+ Total tax: {Math.Round(order.Tax)}\n";
+        receiptTotals += $"+ Total paid: {Math.Round(payment.AmountPaid)} + {payment.Gratuity} (gratuity) - {calculatedLoyaltyDiscount} (discount) = {totalPaid}\n";
         receiptTotals += $"+ Loyalty points used: {paymentRequest.LoyaltyPointsToUse} = -{calculatedLoyaltyDiscount}\n";
-        receiptTotals += $"+ Total deduced from customer: {payment.AmountPaid}\n";
+        receiptTotals += $"+ Total deduced from customer: {Math.Round(payment.AmountPaid)}\n";
         receiptTotals += $"(Payment method used: {paymentRequest.PaymentMethod})";
         order.Receipt += receiptTotals;
 

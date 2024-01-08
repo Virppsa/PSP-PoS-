@@ -1,6 +1,7 @@
 ﻿using PspPos.Models;
 using PspPos.Models.DTO.Requests;
 using System.Linq.Expressions;
+using static PspPos.Models.DTO.Requests.AppointmentCreateRequest;
 
 namespace PspPos.Infrastructure
 {
@@ -26,5 +27,7 @@ namespace PspPos.Infrastructure
         public Task<bool> AppointmentsRelationshipsAreValid(Guid companyId, Guid serviceId);
 
         public Task<Appointment> GetValidatedAppointment(AppointmentCreateRequest appointment, Guid companyId, Guid? appointmentId);
+
+        public Task<Appointment> GetValidatedUpdatedAppointment(AppointmentUpdateRequest appointment, Guid companyId, Guid? appointmentId);
     }
 }

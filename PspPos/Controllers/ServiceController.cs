@@ -186,7 +186,7 @@ namespace PspPos.Controllers
 
             // should be moved to service
             var discount = TaxSystem.CreateDefaultServiceDiscount(serviceId);
-            var serviceWithDiscount = new Service { Id = serviceId, companyId = companyId, Description = service.Description, Price = service.Price, Name = service.Name, Tax = service.Tax, SerializedDiscount = JsonConvert.SerializeObject(discount) };
+            var serviceWithDiscount = new Service { Id = serviceId, companyId = companyId, Description = service.Description, Price = service.Price, Name = service.Name, Tax = TaxSystem.TaxMultiplier, SerializedDiscount = JsonConvert.SerializeObject(discount) };
 
             try
             {
@@ -289,7 +289,7 @@ namespace PspPos.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPut("/cinematic/{companyId}/appointments/{appointmentId}")]
-        public async Task<ActionResult<Appointment>> EditAppointment([FromBody] AppointmentCreateRequest body, Guid companyId, Guid appointmentId)
+        public async Task<ActionResult<Appointment>> EditAppointment([FromBody] AppointmentUpdateRequest body, Guid companyId, Guid appointmentId)
         {
             if (!await _context.CheckIfCompanyExists(companyId))
             {
@@ -300,7 +300,7 @@ namespace PspPos.Controllers
 
             try
             {
-                appointment = await _appointmentsService.GetValidatedAppointment(body, companyId, appointmentId);
+                appointment = await _appointmentsService.GetValidatedUpdatedAppointment(body, companyId, appointmentId);
             }
             catch (NotFoundException)
             {
