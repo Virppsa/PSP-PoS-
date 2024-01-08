@@ -94,7 +94,7 @@ public class OrderService : IOrderService
         await AddNewAppointments(orderToUpdate.Id, orderToUpdate.Appointments, order.Appointments);
         await RemoveDeletedAppointments(orderToUpdate.Appointments, order.Appointments);
         orderToUpdate.Appointments = order.Appointments;
-        var aggregatedAppointmentInfo = await GetTotalsAppointments(order.Appointments);
+        var aggregatedAppointmentInfo = await GetTotalsAppointments(companyId, order.Appointments);
         newTotalAmount += aggregatedAppointmentInfo.TotalPrice;
         newTotalTax += aggregatedAppointmentInfo.TotalTax;
         newReceipt += aggregatedAppointmentInfo.PartialReceipt;
@@ -118,14 +118,15 @@ public class OrderService : IOrderService
         return orderToUpdate;
     }
 
-    private async Task<(double TotalPrice, double TotalTax, string PartialReceipt)> GetTotalsAppointments(Guid[] appointmentIds)
+    private async Task<(double TotalPrice, double TotalTax, string PartialReceipt)> GetTotalsAppointments(Guid companyId, Guid[] appointmentIds)
     {
         double totalPrice = 0;
         double totalTax = 0;
         string partialReceipt = "--- APPOINTMENTS: ---\n";
 
-        var allAppointments = (await _appointmentsService.GetAllByPropertyAsync(app => appointmentIds.Contains(app.Id))).ToArray();
-        var allServices = await _serviceService.GetAllByPropertyAsync(service => allAppointments.Any(app => app.ServiceId == service.Id)); 
+        var allAppointments = (await _appointmentsService.GetAllByPropertyAsync(app => appointmentIds.Contains(app.Id))).ToList();
+
+        var allServices = await _serviceService.GetAllByPropertyAsync(service => service.companyId == companyId); 
 
         foreach(var app in allAppointments)
         {

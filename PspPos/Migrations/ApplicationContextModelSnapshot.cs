@@ -168,9 +168,6 @@ namespace PspPos.Migrations
                     b.Property<Guid>("CustomerId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<double>("Gratuity")
-                        .HasColumnType("float");
-
                     b.Property<string>("ItemOrders")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -180,6 +177,10 @@ namespace PspPos.Migrations
 
                     b.Property<Guid?>("PaymentId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Receipt")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -237,11 +238,17 @@ namespace PspPos.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<double>("AmountPaid")
+                        .HasColumnType("float");
+
                     b.Property<Guid>("CustomerId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<float?>("LoyaltyDiscount")
-                        .HasColumnType("real");
+                    b.Property<double>("Gratuity")
+                        .HasColumnType("float");
+
+                    b.Property<double>("LoyaltyDiscount")
+                        .HasColumnType("float");
 
                     b.Property<Guid>("OrderId")
                         .HasColumnType("uniqueidentifier");
@@ -253,9 +260,6 @@ namespace PspPos.Migrations
                     b.Property<string>("PaymentStatus")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<float?>("TotalAmount")
-                        .HasColumnType("real");
 
                     b.HasKey("Id");
 

@@ -117,14 +117,14 @@ namespace PspPos.Migrations
                     CompanyId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     WorkerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CustomerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Gratuity = table.Column<double>(type: "float", nullable: false),
                     Tax = table.Column<double>(type: "float", nullable: false),
                     TotalAmount = table.Column<double>(type: "float", nullable: false),
                     Appointments = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ItemOrders = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     OrderDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PaymentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    PaymentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Receipt = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -140,8 +140,9 @@ namespace PspPos.Migrations
                     CustomerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     PaymentMethod = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PaymentStatus = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    LoyaltyDiscount = table.Column<float>(type: "real", nullable: true),
-                    TotalAmount = table.Column<float>(type: "real", nullable: true)
+                    LoyaltyDiscount = table.Column<double>(type: "float", nullable: false),
+                    AmountPaid = table.Column<double>(type: "float", nullable: false),
+                    Gratuity = table.Column<double>(type: "float", nullable: false)
                 },
                 constraints: table =>
                 {
