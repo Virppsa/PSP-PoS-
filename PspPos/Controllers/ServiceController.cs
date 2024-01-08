@@ -186,18 +186,19 @@ namespace PspPos.Controllers
 
             // should be moved to service
             var discount = TaxSystem.CreateDefaultServiceDiscount(serviceId);
-            var serviceWithDiscount = new Service { Id = serviceId, companyId = companyId, Description = service.Description, Price = service.Price, Name = service.Name, Tax = TaxSystem.TaxMultiplier, SerializedDiscount = JsonConvert.SerializeObject(discount) };
+
+            service.SerializedDiscount = JsonConvert.SerializeObject(discount);
 
             try
             {
-               await _serviceService.UpdateAsync(serviceWithDiscount);
+               await _serviceService.UpdateAsync(service);
             }
             catch
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Failed to Apply Discount to a Service");
             }
 
-            return Ok(serviceWithDiscount);
+            return Ok(service);
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
