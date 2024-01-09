@@ -12,11 +12,16 @@ GET /cinematic/{companyId}/inventory does not have implemented filters.
 2. Additional POST /cinematic/{companyId}/itemOrders/{itemOrderId} and DELETE /cinematic/{companyId}/itemOrders/{itemOrderId} endpoints were added.
 3. Void feature for payments has been removed since Refund has exact same functionalilty.
 4. Several update endpoints (assign worker, edit state) have been merged into one Update endpoint for Orders.
-5. Loyalty system has been changed to offer flat discount based on amount of points accrued by customer. 
+5. Loyalty system has been changed to offer flat discount based on amount of points accrued by customer.
 
-## Added - 2023-12-11
+## Changes made to USER endpoints
 
-Sample project with crud.
+1. Removed the sign in endpoint since authentication was out of scope for this.
+2. Changed LoyaltyBonuses to LayaltyPoints, since there was no way to make LoyaltyBonuses comply with the assignment requirements with the given API contract.
+
+## Changes made to SERVICE endpoints
+
+1. Changed query parametes of querying appointments to be StartDate and EndDate instead of just querying appointments of a certain day as it would be more convenient to our users.
 
 ## To run locally
 
