@@ -38,7 +38,7 @@ public class PaymentService: IPaymentService
 
             user.LoyaltyPoints -= paymentRequest.LoyaltyPointsToUse; 
             await _userService.UpdateUser(user.GUID, companyId, new UserPostModel { LoyaltyPoints = user.LoyaltyPoints});
-            calculatedLoyaltyDiscount = paymentRequest.LoyaltyPointsToUse / 100;
+            calculatedLoyaltyDiscount = (double)paymentRequest.LoyaltyPointsToUse / 100;
         }
 
         Payment payment = new Payment 

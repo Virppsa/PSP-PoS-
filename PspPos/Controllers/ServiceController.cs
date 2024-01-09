@@ -63,7 +63,7 @@ namespace PspPos.Controllers
                 return StatusCode(StatusCodes.Status404NotFound, "Provided Company does not exist");
             }
 
-            var service = new Service { Id = Guid.NewGuid(), companyId = companyId, Description = body.Description, Price = body.Price, Name = body.Name, Tax = TaxSystem.TaxMultiplier };
+            var service = new Service { Id = Guid.NewGuid(), companyId = companyId, Description = body.Description, Price = body.Price, Name = body.Name, Tax = Math.Round(TaxSystem.TaxMultiplier, 2) };
             // calculate tax and add also
             await _serviceService.InsertAsync(service);
 
@@ -113,7 +113,7 @@ namespace PspPos.Controllers
                 return StatusCode(StatusCodes.Status404NotFound, "Provided Company does not exist");
             }
 
-            var service = new Service { Id = serviceId, companyId = companyId, Description = body.Description, Price = body.Price, Name = body.Name, Tax = body.Price * TaxSystem.TaxMultiplier };
+            var service = new Service { Id = serviceId, companyId = companyId, Description = body.Description, Price = body.Price, Name = body.Name, Tax = Math.Round(TaxSystem.TaxMultiplier, 2) };
             // calculate tax and add also
 
             try 
